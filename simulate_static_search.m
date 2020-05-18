@@ -4,7 +4,7 @@ function [search_result] = simulate_static_search(init_pose, search_path)
 
 %% Environment Setup
 % Define OPI
-opi = [8, 11, 2];        % [x, y, label]
+opi = [3, 6, 1];        % [x, y, label]
 
 % Object Detector sensor
 detector = ObjectDetector;
@@ -62,8 +62,14 @@ for i = 2:numel(time_vector)    % start index at 2nd element
     viz(pose(:,i),search_path,opi)
     waitfor(rate);
     
-    % Check if object is found
-    search_result = true;
+    % Check if OPI is found
+    detections = detector(pose(:,i),opi);       %
+    if ~isempty(detections)
+        disp('OPI detected. Ending search.');
+        search_result = true;
+        break;
+    end
+    
 end
 
 
