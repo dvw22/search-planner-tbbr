@@ -35,7 +35,7 @@ controller.MaxAngularVelocity = 1.5;
 
 % Time Array
 sample_time = 0.1;              % [s]
-end_time = 10;                  % [s]
+end_time = 300;                  % Arbitrarily set to 5 minutes [s]
 time_vector = 0:sample_time:end_time;
 
 % Pose Array
