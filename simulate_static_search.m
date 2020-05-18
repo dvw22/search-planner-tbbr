@@ -4,7 +4,7 @@ function [search_result] = simulate_static_search(init_pose, search_path)
 
 %% Environment Setup
 % Define OPI
-opi = [3, 6, 1];        % [x, y, label]
+opi = [7, 8, 1];        % [x, y, label]
 
 % Object Detector sensor
 detector = ObjectDetector;
@@ -63,12 +63,20 @@ for i = 2:numel(time_vector)    % start index at 2nd element
     waitfor(rate);
     
     % Check if OPI is found
-    detections = detector(pose(:,i),opi);       %
+    detections = detector(pose(:,i),opi);
     if ~isempty(detections)
         disp('OPI detected. Ending search.');
         search_result = true;
         break;
     end
+    
+    % End simulation if last waypoint is reached
+    dist_between = [pose(1,i),pose(2,i);search_path(end,1),search_path(end,2)];
+    if pdist(dist_between,'euclidean') < 0.1    % search ends if robot within 0.1m radius of waypoint
+        disp('End of search path reached. Ending search.');
+        search_result = false;
+        break;
+    end 
     
 end
 
