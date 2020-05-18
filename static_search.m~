@@ -1,0 +1,21 @@
+function [search_result] = static_search(init_pose, search_path, map, mobility_controller)
+%static_search Makes a mobile robot execute a search path on the map.
+%   Detailed explanation goes here
+
+%% Simulation Setup
+% Define Vehicle
+wheel_radius = 0.1;                        % Wheel [m]
+wheel_base = 0.5;                        % [m]
+mobile_robot = DifferentialDrive(wheel_radius,wheel_base);
+
+% Time Array
+sample_time = 0.1;              % [s]
+end_time = 45;                  % [s]
+time_vector = 0:sample_time:end_time;
+
+% Pose Array
+pose = zeros(3,numel(time_vector));   % Initialise array, [x, y, angle
+pose(:,1) = init_pose;          % Add initial condition
+
+end
+
