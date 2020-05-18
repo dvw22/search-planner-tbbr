@@ -2,28 +2,27 @@ function [search_result] = simulate_static_search(init_pose, search_path)
 %simulate_static_search Simulates a mobile robot statically executing a search path on the map.
 %   Detailed explanation goes here
 
-%% Simulation Setup
-% Define Vehicle
-wheel_radius = 0.1;                        % Wheel [m]
-wheel_base = 0.5;                        % [m]
-mobile_robot = DifferentialDrive(wheel_radius,wheel_base);
+%% Environment Setup
+% Define OPI
+opi = [8, 11, 2];        % [x, y, label]
 
-% Time Array
-sample_time = 0.1;              % [s]
-end_time = 45;                  % [s]
-time_vector = 0:sample_time:end_time;
-
-% Pose Array
-pose = zeros(3,numel(time_vector));   % Initialise array, [x, y, theta] x time vector
-pose(:,1) = init_pose;          % Add initial condition
-
-% Map
-
+% Object Detector sensor
+detector = ObjectDetector;
+detector.fieldOfView = pi/4;    % [rad]
 
 % Simulation Visualiser
 viz = Visualizer2D;
 viz.hasWaypoints = true;
 viz.mapName = 'map';
+attachObjectDetector(viz,detector);
+viz.objectColors = [1 0 0;0 1 0;0 0 1];
+viz.objectMarkers = 'so^';
+
+%% Vehicle Setup
+% Define Vehicle
+wheel_radius = 0.1;                        % [m]
+wheel_base = 0.5;                        % [m]
+mobile_robot = DifferentialDrive(wheel_radius,wheel_base);
 
 % Path Following Controller
 controller = controllerPurePursuit;
@@ -31,6 +30,17 @@ controller.Waypoints = search_path;
 controller.LookaheadDistance = 0.5;
 controller.DesiredLinearVelocity = 0.75;
 controller.MaxAngularVelocity = 1.5;
+
+%% Simulation Loop Setup
+
+% Time Array
+sample_time = 0.1;              % [s]
+end_time = 10;                  % [s]
+time_vector = 0:sample_time:end_time;
+
+% Pose Array
+pose = zeros(3,numel(time_vector));   % Initialise array, [x, y, theta] x time vector
+pose(:,1) = init_pose;          % Add initial condition
 
 %% Simulation Loop
 rate = rateControl(1/sample_time);
@@ -49,7 +59,7 @@ for i = 2:numel(time_vector)    % start index at 2nd element
     pose(:,i) = pose(:,i-1) + world_distance;    % Calculate new pose
     
     % Update visualization
-    viz(pose(:,i),search_path)
+    viz(pose(:,i),search_path,opi)
     waitfor(rate);
     
     % Check if object is found
