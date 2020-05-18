@@ -7,6 +7,7 @@ initial_pose = [2,2,0];     % [x, y, theta]
 % Map
 load exampleMap;
 occupancy_matrix = occupancyMatrix(map);
+[area, num_cells] = unoccupied_area(occupancy_matrix, map);
 
 %% Compute Search Path
 search_path = [2,2;
