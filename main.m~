@@ -1,0 +1,9 @@
+% Most of the content happens here
+
+initial_pose = [2,2];
+
+search_path = [2,2;
+               3,3;
+               3,5];
+
+result = simulate_static_search(initial_pose, search_path);
