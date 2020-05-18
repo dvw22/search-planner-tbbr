@@ -1,4 +1,4 @@
-function [search_result] = simulate_static_search(init_pose, search_path)
+function [search_result] = simulate_static_search(init_pose, search_path, map)
 %simulate_static_search Simulates a mobile robot statically executing a search path on the map.
 %   Detailed explanation goes here
 
@@ -51,9 +51,6 @@ for i = 2:numel(time_vector)    % start index at 2nd element
     % Update visualization
     viz(pose(:,i),search_path)
     waitfor(rate);
-    
-    % Check if object is found
-    search_result = true;
 end
 
 
