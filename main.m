@@ -12,8 +12,8 @@ occupancy_matrix = occupancyMatrix(map);
 %% Compute Search Path
 search_path = [2,2;
                3,3;
-               3,5;
-               6,8];
+               1,5;
+               3,6];
 
 %% Simulate Search
 result = simulate_static_search(initial_pose, search_path);

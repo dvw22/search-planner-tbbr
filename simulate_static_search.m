@@ -4,7 +4,7 @@ function [search_result] = simulate_static_search(init_pose, search_path)
 
 %% Environment Setup
 % Define OPI
-opi = [7, 8, 1];        % [x, y, label]
+opi = [4, 8, 1];        % [x, y, label]
 
 % Object Detector sensor
 detector = ObjectDetector;
