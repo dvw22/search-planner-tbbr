@@ -16,31 +16,28 @@ slice_R = map(:,slice_index+1);
 last_connectivity = 0;
 last_connections = [];
 current_cell = 1;
-current_cells = [];  % tracks the cells occupying a slice
+current_cells = [];  % size cannot be determined
 
 %% Loop
 current_slice = slice_R;  % get slice
 [connectivity, connections] = slice_connectivity(current_slice);  % check
 
-% New cells are produced if the previous slice had no splits in
-% connectivity
+% The program started or the previous slice had no s
 if last_connectivity == 0
     current_cells = [];  % reset current cells
     
-    % If there is a split in connectivity, track new cells produced
     for i = 1:length(connectivity)+1
         current_cells = [current_cells, current_cell];
         current_cell = current_cell + 1;
     end
 
-% ...unless the current cell also has no splits in connectivity
+% 
 elseif connectivity == 0
     current_cells = [];  % reset current cells
 
-% Otherwise, the slice is passing through a split region
+% Only possible alternative 
 else
-    % We use an adjacency matrix to 
-    adj_matrix = connections_adjacency(last_connections, connections)
+    
 end
 
 
