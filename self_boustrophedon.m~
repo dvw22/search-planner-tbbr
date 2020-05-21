@@ -22,11 +22,28 @@ current_cells = [];
 for col = 1:size(map,2)
     %% Check connectivity of the slice
     [connectivity, connections] = slice_connectivity(map(:,col));
+    
+    %% Compare slices using adjacency matrix
+    adj_matrix = connections_adjacency(last_connections,connections);
      
     %% Determine slice splitting/joining
-    if connectivity > last_connectivity
+    % Each individual connection in the slice can be checked for splitting
+    % or joining. This is done using the adjacency matrix. The sum of a row
+    % indicates how many right slice connections a left slice connections
+    % is adjacent to. The sum of a column indicates how many left slice
+    % connections a right slice connection is adjacent to.
+    
+    % Compare slices left to right using adjacency matrix row
+    for i = 1:size(adj_matrix,1)
+        if sum(adj_matrix(i,:)) == 1
+            % The connection di
+        end
+    end
+    
+    if sum(adj
         % New cell(s) has/have been formed
-        e
+    elseif connectivity <
+    end
     
     
     % Update map
