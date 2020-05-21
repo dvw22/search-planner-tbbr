@@ -29,6 +29,7 @@ for i = 1:length(slice)
         end_point = i;
         connections(connectivity, 1) = start_point;
         connections(connectivity, 2) = end_point;
+    % Logs the part closing if it reaches the end of the slice
     elseif i == length(slice) && open_part == true
         open_part = false;
         end_point = i;
