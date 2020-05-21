@@ -12,7 +12,7 @@ function [connectivity,connections] = slice_connectivity(slice)
 connectivity = 0;
 last_data = 0;
 open_part = false;
-connective_parts = []; % unknown length
+connections = []; % unknown length
 
 %% Loop Through
 for i = 1:length(slice)
