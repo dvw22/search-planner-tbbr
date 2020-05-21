@@ -19,23 +19,27 @@ for i = 1:length(slice)
     data = slice(i);
     
     % Connectivity opens
-    if data == 0 && open_part == false
+    if data(i) == 0
         open_part = true;
         connectivity = connectivity + 1;
         start_point = i;
     % Connectivity closes
     elseif last_data == 0 && data == 1 && open_part == true
         open_part = false;
-        end_point = i;
-        connections(connectivity, 1) = start_point;
-        connections(connectivity, 2) = end_point;
-    elseif i == length(slice) && open_part == true
-        open_part = false;
-        end_point = i;
-        connections(connectivity, 1) = start_point;
-        connections(connectivity, 2) = end_point;
+    
+    % Connectivity opens
+    if last_data == 0 && data == 1
+        open_part = true;
+        start_point = i;
+    % Connectivity closes
+    elseif last_data == 1 && data == 0 && open_part == true
+            open_part = false;
+            connectivity = connectivity + 1;
+            end_point = i;
+            connections(connectivity, 1) = start_point;
+            connections(connectivity, 2) = end_point;
     end
-        
+    
     % Store data
     last_data = data;
     
