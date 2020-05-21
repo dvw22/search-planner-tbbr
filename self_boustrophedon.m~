@@ -22,15 +22,11 @@ current_cells = [];
 for col = 1:size(map,2)
     %% Check connectivity of the slice
     [connectivity, connections] = slice_connectivity(map(:,col));
-    
-    %% Compare slices using adjacency matrix
-    
-    adjacency_matrix = connections_adjacency(last_connections,connections);
      
     %% Determine slice splitting/joining
     if connectivity > last_connectivity
         % New cell(s) has/have been formed
-    end
+        e
     
     
     % Update map
