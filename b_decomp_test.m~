@@ -50,19 +50,12 @@ for col = 1:size(map,2)
         for i = 1:size(adj_matrix,1)
             % A connection does not split or join
             if sum(adj_matrix(i,:)) == 1
-                % PROBABLY WRONG
-               [x, y] = find(adj_matrix(i,:));
-               new_cells(x(1)) = current_cells(i);
-               
+                adj_matrix;
             % A connection has split, meaning an IN occurred
             elseif sum(adj_matrix(i,:)) > 1
-                [x, y] = find(adj_matrix(i,:));
-                for index = 1:size(x,2)
-                    % PROBABLY WRONG
-                    new_cells(x(index)) = current_cell;
-                    current_cell = current_cell + 1;
-                end
-                
+                [x
+                find(adj_matrix(i,:)
+                for index = 
             end
         end
 
@@ -73,12 +66,10 @@ for col = 1:size(map,2)
             if sum(adj_matrix(:,i)) > 1
                 new_cells(i) = current_cell;
                 current_cell = current_cell + 1;
-                
-            % ???
+            % A 
             elseif sum(adj_matrix(:,i)) == 0
                 new_cells(i) = current_cell;
                 current_cell = current_cell + 1;
-                
             end
         
         % Update cells list
