@@ -48,6 +48,8 @@ for col = 1:size(map,2)
     else
         %% Compare slices using adjacency matrix
         adj_matrix = connections_adjacency(last_connections,connections);
+        insertion = [];
+        replacement = [];
 
         % Compare slices left to right using adjacency matrix row
         for i = 1:size(adj_matrix,1)
@@ -61,14 +63,14 @@ for col = 1:size(map,2)
                 % Check how many new cells are produced and track
                 for j = 1:sum(adj_matrix(i,:))
                     cell_counter = cell_counter + 1;
-                    new_cells = [new_cells, cell_counter];
+                    insertion = [insertion, cell_counter];
                 end
                 
                 % Insert the new cells in order into the current cells
                 % array
                 before_insertion = current_cells(1:i-1);
                 after_insertion = current_cells(i+1:size(current_cells,2));
-                current_cells = [before_insertion,new_cells,after_insertion];
+                current_cells = [before_insertion,insertion,after_insertion];
                 
             end
         end
