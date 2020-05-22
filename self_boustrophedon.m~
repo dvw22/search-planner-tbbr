@@ -18,6 +18,7 @@ last_connectivity = 0;
 last_connections = [];
 cell_counter = 0;  % tracks the number of cells total
 current_cells = [];  % tracks which cells are in a slice
+new_cells = []; % stores new cells that are formed for each connection
 
 for col = 1:size(map,2)
     %% Check connectivity of the slice
@@ -62,6 +63,14 @@ for col = 1:size(map,2)
                 % add a count to the cell_counter for each one
                 % replace old connection's cell number with new cell 
                 % numbers in correct place in current_cell array
+                for j = 1:sum(adj_matrix(j,:))
+                    cell_counter = cell_counter + 1;
+                    new_cells = [new_cells, cell_counter];  % store the new cells
+                end
+                
+                % Insert the new cells into the current cells array
+                current_cells = [current_cells(1:i)new_cells];
+                
             end
         end
 
@@ -89,7 +98,9 @@ for col = 1:size(map,2)
     else
         for i = 1:size(connections,1)
             % Fill connectivity segments with corresponding cell numbers
-            new_map(connections(i,1):connections(i,2,col)
+            start_fill = connections(i,1);
+            end_fill = connections(i,2)-1;
+%             new_map(start_fill:end_fill,col) = current_cells(i);
         end
     end
         
