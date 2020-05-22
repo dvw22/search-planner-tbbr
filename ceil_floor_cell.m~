@@ -25,12 +25,6 @@ for i = 1:size(zeroed_except_cell,1)
 end
 
 % Find left wall offset of cell
-for i = 1:size(zeroed_except_cell,2)
-    if ~all(zeroed_except_cell(:,i)==0)
-        leftwall_offset = i-1;
-        break
-    end
-end
 
 % Look for ceiling and floor indices within cell
 for col = 1:cell_length
@@ -38,7 +32,6 @@ for col = 1:cell_length
     for i = 1:size(truncated_cell,1)
         if truncated_cell(i,col)==1
             cell_ceiling_idx(col,1) = i + ceiling_offset;  % store x index
-            cell_ceiling_idx(col,2) = col + leftwall_offset;  % store y index
             break
         end
     end
@@ -48,7 +41,6 @@ for col = 1:cell_length
     for i = size(truncated_cell,1):-1:1
         if truncated_cell(i,col)==1
             cell_floor_idx(col,1) = i + ceiling_offset;  % store x index
-            cell_floor_idx(col,2) = col + leftwall_offset;  % store y index
             break
         end
     end
