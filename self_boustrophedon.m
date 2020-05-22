@@ -89,6 +89,9 @@ for col = 1:size(map,2)
     else
         for i = 1:size(connections,1)
             % Fill connectivity segments with corresponding cell numbers
+            start_fill = connections(i,1);
+            end_fill = connections(i,2)-1;
+%             new_map(start_fill:end_fill,col) = current_cells(i);
         end
     end
         
