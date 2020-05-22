@@ -59,7 +59,7 @@ for col = 1:size(map,2)
             % The connection split: IN condition
             elseif sum(adj_matrix(i,:)) > 1
                 % Check how many new cells are produced and track
-                for j = 1:sum(adj_matrix(j,:))
+                for j = 1:sum(adj_matrix(i,:))
                     cell_counter = cell_counter + 1;
                     new_cells = [new_cells, cell_counter];
                 end
@@ -80,6 +80,13 @@ for col = 1:size(map,2)
                 % add just one count to the cell_counter
                 % replace old connections' cell numbers with new cell
                 % number in correct place in current_cell array
+                cell_counter = cell_counter + 1;
+                replacement = cell_counter;
+                
+                % Replace
+                before_replacement = current_cells(1:i-1);
+                after_replacement = current_cells(i+sum(adj_matrix(:,i)):size(current_cells,2));
+                current_cells = [before_replacement, replacement, after_replacement];
                 
             % A new connection formed inside an obstacle: IN condition
             elseif sum(adj_matrix(:,i)) == 0
