@@ -82,7 +82,7 @@ for col = 1:size(occupancy_map,2)
                 after_replacement = current_cells(i+sum(adj_matrix(:,i)):size(current_cells,2));
                 current_cells = [before_replacement, replacement, after_replacement];
                 
-            % A new connection formed inside an obstacle: IN condition
+            % A new connection formed from an obstacle: IN condition
             elseif sum(adj_matrix(:,i)) == 0
                 % add just one count to the cell_counter
                 % insert this new cell in the correct place in current_cell
@@ -91,7 +91,7 @@ for col = 1:size(occupancy_map,2)
                 insertion = cell_counter;
                 
                 before_insertion = current_cells(1:i-1);
-                after_insertion = current_cells(i+1:size(current_cells,2));
+                after_insertion = current_cells(i:size(current_cells,2));
                 current_cells = [before_insertion, insertion, after_insertion];
             end
         end
