@@ -1,18 +1,18 @@
 %% Testing setup
 
-% map = occupancyMatrix(map);
-% occupancy_map = round(occupancy_map);
+binary_map = occupancyMatrix(map);
+occupancy_map = round(binary_map);
 
-% binary_map = round(occVal);
+% occupancy_map = round(occVal);
 
-occupancy_map = [1,1,1,1,1,1,1,1,1,1,1;
-                 1,0,1,0,0,0,0,0,0,0,1;
-                 1,0,0,0,1,1,1,1,1,0,1;
-                 1,0,0,1,1,1,0,0,1,0,1;
-                 1,0,0,1,1,1,0,0,1,0,1;
-                 1,0,0,1,1,1,1,1,1,0,1;
-                 1,0,0,0,1,1,0,0,0,0,1;
-                 1,1,1,1,1,1,1,1,1,1,1];
+% occupancy_map = [1,1,1,1,1,1,1,1,1,1,1;
+%                  1,0,1,0,0,0,0,0,0,0,1;
+%                  1,0,0,0,1,1,1,1,1,0,1;
+%                  1,0,0,1,1,1,0,0,1,0,1;
+%                  1,0,0,1,1,1,0,0,1,0,1;
+%                  1,0,0,1,1,1,1,1,1,0,1;
+%                  1,0,0,0,1,1,0,0,0,0,1;
+%                  1,1,1,1,1,1,1,1,1,1,1];
 
 [decomposed_map, num_cells] = btd_cell_decomposition(occupancy_map);
 

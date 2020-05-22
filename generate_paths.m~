@@ -14,8 +14,8 @@ truncated_cell = col_cut(any(col_cut,2),:);  % cut zero rows
 cell_length = size(truncated_cell,2);
 
 % Initialise ceiling and floor arrays to track indices
-cell_ceiling_idx = zeros(cell_length,1);  % [x1, x2, x3, ...]
-cell_floor_idx = cell_ceiling_idx;
+cell_ceiling = zeros(cell_length,1);  % [x1, y1; x2, y2; ...]
+cell_floor = cell_ceiling;
 ceiling_offset = 0;  % how many zero rows were cut from the top
 floor_offset = 0;  % how many zero rows were cut from the bottom
 
@@ -23,7 +23,8 @@ for col = 1:cell_length
     % Look down through each row until top of cell is found in column slice
     for i = 1:size(truncated_cell,1)
         if truncated_cell(i,col)==cell
-            cell_ceiling_idx(col,1) = i + ceiling_offset;  % store x index
+            cell_ceiling(col,1) = i + ceiling_offset;  % store x index
+            cell_ceiling(col,2) = col;  % store y index
             break
         end
     end
@@ -32,14 +33,15 @@ for col = 1:cell_length
     % slice
     for i = size(truncated_cell,1):-1:1
         if truncated_cell(i,col)==cell
-            cell_floor_idx(col,1) = i + floor_offset;  % store x index
+            cell_floor(col,1) = i + floor_offset;  % store x index
+            cell_floor(col,2) = col;  % store y index
             break
         end
     end
 end
 
-cell_ceiling_idx
-cell_floor_idx
+cell_ceiling
+cell_floor
 
 
 
