@@ -77,13 +77,12 @@ for col = 1:size(map,2)
         for i = 1:size(adj_matrix,2)
             % The connection joined: OUT condition
             if sum(adj_matrix(:,i)) > 1
-                % add just one count to the cell_counter
-                % replace old connections' cell numbers with new cell
-                % number in correct place in current_cell array
+                % Track new cells (replaces other cells this time)
                 cell_counter = cell_counter + 1;
                 replacement = cell_counter;
                 
-                % Replace
+                % Replace cells that merged with new cell and update
+                % current_cell matrix
                 before_replacement = current_cells(1:i-1);
                 after_replacement = current_cells(i+sum(adj_matrix(:,i)):size(current_cells,2));
                 current_cells = [before_replacement, replacement, after_replacement];
@@ -93,6 +92,12 @@ for col = 1:size(map,2)
                 % add just one count to the cell_counter
                 % insert this new cell in the correct place in current_cell
                 % array
+                cell_counter = cell_counter + 1;
+                insertion = cell_counter;
+                
+                before_insertion = current_cells(1:i-1);
+                after_insertion = current_cells(i+1:size(current_cells,2));
+                current_cells = [before_insertion, insertion, after_insertion];
             end
         end
     end
@@ -106,7 +111,7 @@ for col = 1:size(map,2)
             % Fill connectivity segments with corresponding cell numbers
             start_fill = connections(i,1);
             end_fill = connections(i,2)-1;
-%             new_map(start_fill:end_fill,col) = current_cells(i);
+            new_map(start_fill:end_fill,col) = current_cells(i);
         end
     end
         
