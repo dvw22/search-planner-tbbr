@@ -10,7 +10,7 @@ occupancy_matrix = occupancyMatrix(map);
 [area, num_cells] = unoccupied_area(map);
 
 %% Compute Search Path
-search_path = [2,2;
+search_path = [2.5,2;
                3,3;
                1,5;
                3,6];

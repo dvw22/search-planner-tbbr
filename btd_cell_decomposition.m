@@ -1,6 +1,6 @@
 function [decomposed_map, cell_counter] = btd_cell_decomposition(occupancy_map)
-%btd_cell_decomposition Uses boustrophedon cell decomposition to output a
-%region divided occupancy map
+% btd_cell_decomposition Uses boustrophedon cell decomposition to output a
+% region divided occupancy map
 %   The occupancy map must have a border of occupied cells for it to work.
 %   For the output, a 0 is an obstacle and the integers are the
 %   corresponding cell number.

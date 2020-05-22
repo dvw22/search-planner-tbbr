@@ -1,5 +1,6 @@
 function display_decomposed_map(decomposed_map)
-%UNTITLED5 Summary of this function goes here
+% display_decomposed_map Displays the cells of a decomposed map as different
+% grayscale shades
 %   Detailed explanation goes here
 
 imshow(decomposed_map, [min(decomposed_map(:)),max(decomposed_map(:))])
