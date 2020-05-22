@@ -1,7 +1,9 @@
-function [decomposed_map] = btd_cell_decomposition(occupancy_map)
+function [decomposed_map, cell_counter] = btd_cell_decomposition(occupancy_map)
 %btd_cell_decomposition Uses boustrophedon cell decomposition to output a
 %region divided occupancy map
 %   The occupancy map must have a border of occupied cells for it to work.
+%   For the output, a 0 is an obstacle and the integers are the
+%   corresponding cell number.
 
 %% Initialise variables
 decomposed_map = zeros(size(occupancy_map));
@@ -44,6 +46,9 @@ for col = 1:size(occupancy_map,2)
 
         % Compare slices left to right using adjacency matrix row
         for i = 1:size(adj_matrix,1)
+            % Reset the insertion
+            insertion = [];
+            
             % The connection does not split
             if sum(adj_matrix(i,:)) == 1
                 % Make sure the current_cell array keeps the same cell
@@ -80,7 +85,7 @@ for col = 1:size(occupancy_map,2)
                 after_replacement = current_cells(i+sum(adj_matrix(:,i)):size(current_cells,2));
                 current_cells = [before_replacement, replacement, after_replacement];
                 
-            % A new connection formed inside an obstacle: IN condition
+            % A new connection formed from an obstacle: IN condition
             elseif sum(adj_matrix(:,i)) == 0
                 % add just one count to the cell_counter
                 % insert this new cell in the correct place in current_cell
@@ -89,7 +94,7 @@ for col = 1:size(occupancy_map,2)
                 insertion = cell_counter;
                 
                 before_insertion = current_cells(1:i-1);
-                after_insertion = current_cells(i+1:size(current_cells,2));
+                after_insertion = current_cells(i:size(current_cells,2));
                 current_cells = [before_insertion, insertion, after_insertion];
             end
         end

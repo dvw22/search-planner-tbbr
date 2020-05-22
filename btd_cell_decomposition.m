@@ -46,6 +46,9 @@ for col = 1:size(occupancy_map,2)
 
         % Compare slices left to right using adjacency matrix row
         for i = 1:size(adj_matrix,1)
+            % Reset the insertion
+            insertion = [];
+            
             % The connection does not split
             if sum(adj_matrix(i,:)) == 1
                 % Make sure the current_cell array keeps the same cell
