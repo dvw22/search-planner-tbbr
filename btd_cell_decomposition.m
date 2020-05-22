@@ -48,14 +48,9 @@ for col = 1:size(occupancy_map,2)
         for i = 1:size(adj_matrix,1)
             % Reset the insertion
             insertion = [];
-            
-            % The connection does not split
-            if sum(adj_matrix(i,:)) == 1
-                % Make sure the current_cell array keeps the same cell
-                % number for this connection
                 
             % The connection split: IN condition
-            elseif sum(adj_matrix(i,:)) > 1
+            if sum(adj_matrix(i,:)) > 1
                 % Check how many new cells are produced and track
                 for j = 1:sum(adj_matrix(i,:))
                     cell_counter = cell_counter + 1;
