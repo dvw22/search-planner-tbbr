@@ -1,0 +1,17 @@
+function display_decomposed_map(decomposed_map, num_cells)
+%UNTITLED5 Summary of this function goes here
+%   Detailed explanation goes here
+
+processed_map = decomposed_map;
+colour_range = 200
+
+for i = 1:num_cells
+    processed_map(processed_map==i) = i * (colour_range/num_cells
+end
+
+processed_map = decomposed_map * (200/num_cells);
+
+imshow(processed_map)
+
+end
+
