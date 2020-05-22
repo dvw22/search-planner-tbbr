@@ -52,7 +52,8 @@ for col = 1:size(map,2)
         for i = 1:size(adj_matrix,1)
             % The connection does not split
             if sum(adj_matrix(i,:)) == 1
-                % no cells need to be added?
+                % Make sure the current_cell array keeps the same cell
+                % number for this connection
                 
             % The connection split: IN condition
             elseif sum(adj_matrix(i,:)) > 1
