@@ -68,6 +68,13 @@ for col = 1:size(occupancy_map,2)
                 after_insertion = current_cells(i+1:size(current_cells,2));
                 current_cells = [before_insertion,insertion,after_insertion];
                 
+            % The connection does not split or join (dead end)
+            elseif sum(adj_matrix(i,:)) == 0
+                % Remove the cell from the current cells array
+                before_removal = current_cells(1:i-1);
+                after_removal = current_cells(i+1:size(current_cells,2));
+                current_cells = [before_removal, after_removal];
+                
             end
         end
 
