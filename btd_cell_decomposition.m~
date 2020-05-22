@@ -1,28 +1,17 @@
-%% Testing setup
-clear
+function [decomposed_map] = btd_cell_decomposition(occupancy_map)
+%UNTITLED4 Summary of this function goes here
+%   The occupancy map must have a border of occupied cells for it to work.
 
-map = [1,1,1,1,1,1,1,1,1,1,1,1
-       1,0,0,0,0,0,0,0,0,0,0,1;
-       1,0,0,1,1,1,0,1,1,1,0,1;
-       1,0,0,1,1,1,0,1,1,1,0,1;
-       1,0,0,1,1,1,0,1,1,1,0,1;
-       1,0,0,0,0,0,0,1,1,1,0,1;
-       1,0,0,0,0,0,0,0,0,0,0,1;
-       1,1,1,1,1,1,1,1,1,1,1,1];
-
-   
-new_map = zeros(size(map));   
-slice_L = map(:,1);
-slice_R = map(:,4);
+%% Initialise variables
 last_connectivity = 0;
 last_connections = [];
 cell_counter = 0;  % tracks the number of cells total
 current_cells = [];  % tracks which cells are in a slice
 new_cells = []; % stores new cells that are formed for each connection
 
-for col = 1:size(map,2)
+for col = 1:size(occupancy_map,2)
     %% Check connectivity of the slice
-    slice = map(:,col);
+    slice = occupmap(:,col);
     [connectivity, connections] = slice_connectivity(slice);
     
     %% Check if we are coming out of a full obstacle slice
@@ -123,7 +112,5 @@ for col = 1:size(map,2)
     
 end
 
-new_map
-
-
+end
 

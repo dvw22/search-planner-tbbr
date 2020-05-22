@@ -1,28 +1,18 @@
-%% Testing setup
-clear
+function [decomposed_map] = btd_cell_decomposition(occupancy_map)
+%UNTITLED4 Summary of this function goes here
+%   The occupancy map must have a border of occupied cells for it to work.
 
-map = [1,1,1,1,1,1,1,1,1,1,1,1
-       1,0,0,0,0,0,0,0,0,0,0,1;
-       1,0,0,1,1,1,0,1,1,1,0,1;
-       1,0,0,1,1,1,0,1,1,1,0,1;
-       1,0,0,1,1,1,0,1,1,1,0,1;
-       1,0,0,0,0,0,0,1,1,1,0,1;
-       1,0,0,0,0,0,0,0,0,0,0,1;
-       1,1,1,1,1,1,1,1,1,1,1,1];
-
-   
-new_map = zeros(size(map));   
-slice_L = map(:,1);
-slice_R = map(:,4);
+%% Initialise variables
+decomposed_map = zeros(size(occupancy_map));
 last_connectivity = 0;
 last_connections = [];
 cell_counter = 0;  % tracks the number of cells total
 current_cells = [];  % tracks which cells are in a slice
 new_cells = []; % stores new cells that are formed for each connection
 
-for col = 1:size(map,2)
+for col = 1:size(occupancy_map,2)
     %% Check connectivity of the slice
-    slice = map(:,col);
+    slice = occupancy_map(:,col);
     [connectivity, connections] = slice_connectivity(slice);
     
     %% Check if we are coming out of a full obstacle slice
@@ -107,13 +97,13 @@ for col = 1:size(map,2)
     %% Update map
     % No connectivity means a full line of obstacles
     if connectivity == 0
-        new_map(:,col) = 0;  % Obstacles are 0
+        decomposed_map(:,col) = 0;  % Obstacles are 0
     else
         for i = 1:size(connections,1)
             % Fill connectivity segments with corresponding cell numbers
             start_fill = connections(i,1);
             end_fill = connections(i,2)-1;
-            new_map(start_fill:end_fill,col) = current_cells(i);
+            decomposed_map(start_fill:end_fill,col) = current_cells(i);
         end
     end
         
@@ -123,7 +113,5 @@ for col = 1:size(map,2)
     
 end
 
-new_map
-
-
+end
 
