@@ -60,7 +60,7 @@ for col = 1:size(occupancy_map,2)
             if sum(adj_matrix(i,:)) > 1
                 % Find the replacement index
                 cell_of_interest = last_cells(i);  % find the number of the cell
-                index_of_interest = find(current_cells==cell_of_interest);
+                index_of_interest = find(current_cells==cell_of_interest);  % desired index of replacement
                 
                 % Check how many new cells are produced and track
                 for j = 1:sum(adj_matrix(i,:))
@@ -68,10 +68,9 @@ for col = 1:size(occupancy_map,2)
                     insertion = [insertion, cell_counter];
                 end
                 
-                % Insert the new cells in order into the current cells
-                % array
+                % Replace the old cell with the new replacement cells
                 before_insertion = current_cells(1:index_of_interest-1);
-                after_insertion = current_cells(index_of_interest+1:size(current_cells,2));
+                after_insertion = current_cells(index_of_interest+1:end);
                 current_cells = [before_insertion,insertion,after_insertion];
                 
             % 3b. The connection does not split or join (dead end)
@@ -93,14 +92,8 @@ for col = 1:size(occupancy_map,2)
             % 3c. The connection joined: OUT condition
             if sum(adj_matrix(:,i)) > 1
                 % Find the replacement index
-                for j = 1:size(adj_matrix,1)
-                    % The first cell is found at the first non-zero row of
-                    % the current adjacency matrix column
-                    if adj_matrix(j,i) == 1
-                        index_of_interest = j;
-                        break
-                    end
-                end
+                cell_of_interest = last_cells(i);  % find the number of the cell
+                index_of_interest = find(current_cells==cell_of_interest);
                 
                 % Track new cells (replaces other cells this time)
                 cell_counter = cell_counter + 1;
