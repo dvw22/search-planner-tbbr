@@ -37,8 +37,15 @@ cell_waypoints(num_waypoints,:) = ceiling_idx(num_ceiling,:);
 
 %% Convert from matrix indices to map waypoints [x, y]
 
+% Flip y points
+cell_waypoints(:,2) = (size(decomposed_map,1)+1) - cell_waypoints(:,2);
+
+% Shift waypoints to centres of grid units
+cell_waypoints = cell_waypoints - 0.5;
+
 % Perform scaling for resolution
 cell_waypoints = cell_waypoints/resolution;
+
 
 end
 
