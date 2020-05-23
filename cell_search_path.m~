@@ -40,16 +40,16 @@ cell_indices(num_indices,:) = ceiling_idx(num_ceiling,:);
 
 % Rows are y reference, columns are x reference (swap)
 cell_waypoints(:,1) = cell_indices(:,2);
-cell_waypoints(:,2) = cell_indices(:,1);
+cell_waypoints(:,2) = 
 
 % Flip y points
-cell_waypoints(:,2) = (size(decomposed_map,1)+1) - cell_waypoints(:,2);
+cell_indices(:,2) = (size(decomposed_map,1)+1) - cell_indices(:,2);
 
 % Shift waypoints to centres of grid units
-cell_waypoints = cell_waypoints - 0.5;
+cell_waypoints = cell_indices - 0.5;
 
 % Perform scaling for resolution
-cell_waypoints = cell_waypoints/resolution;
+cell_waypoints = cell_indices/resolution;
 
 
 end
