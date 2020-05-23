@@ -19,8 +19,7 @@ for col = 1:size(occupancy_map,2)
     
     %% 1. Check if we are coming out of a full obstacle slice
     if last_connectivity == 0
-        % Reset current_cells for population
-        current_cells = [];
+        
         
         % loop through number of connections in the new slice and add these
         % cells
