@@ -32,7 +32,7 @@ for col = 1:size(occupancy_map,2)
         end
         
         % Update graph
-        reeb_graph = reeb_graph.addnode(size(current_cells,2));
+        reeb_graph = addnode(reeb_graph,size(current_cells,2));
         
     %% 2. Check if we are in a full obstacle slice
     elseif connectivity == 0
@@ -73,7 +73,8 @@ for col = 1:size(occupancy_map,2)
                 current_cells = [before_split,split,after_split];
                 
                 % Update graph
-                reeb_graph = reeb_graph.addnode(size(split,2));
+                reeb_graph = addnode(reeb_graph,size(split,2));
+                reeb_graph = addedge(reeb_graph,cell_of_interest,split);
                 
             % 3b. The connection does not split or join (dead end)
             elseif sum(adj_matrix(i,:)) == 0
@@ -104,7 +105,7 @@ for col = 1:size(occupancy_map,2)
                 current_cells = [before_join, join, after_join];
                 
                 % Update graph
-                reeb_graph = reeb_graph.addnode(1);
+                reeb_graph = addnode(reeb_graph,1);
                 
             % 3d. A new connection formed from an obstacle: IN condition
             elseif sum(adj_matrix(:,i)) == 0
@@ -122,7 +123,7 @@ for col = 1:size(occupancy_map,2)
                 current_cells = [before_insert, insert, after_insert];
                 
                 % Update graph
-                reeb_graph = reeb_graph.addnode(1);
+                reeb_graph = addnode(reeb_graph,1);
                 
             end
         end
