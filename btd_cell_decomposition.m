@@ -92,14 +92,24 @@ for col = 1:size(occupancy_map,2)
         for i = 1:size(adj_matrix,2)
             % 3c. The connection joined: OUT condition
             if sum(adj_matrix(:,i)) > 1
+                % Find the replacement index
+                for j = 1:size(adj_matrix,1)
+                    % The first cell is found at the first non-zero row of
+                    % the current adjacency matrix column
+                    if adj_matrix(j,i) == 1
+                        index_of_interest = j;
+                        break
+                    end
+                end
+                
                 % Track new cells (replaces other cells this time)
                 cell_counter = cell_counter + 1;
                 replacement = cell_counter;
                 
                 % Replace cells that merged with new cell and update
                 % current_cell matrix
-                before_replacement = current_cells(1:i-1);
-                after_replacement = current_cells(i+sum(adj_matrix(:,i)):size(current_cells,2));
+                before_replacement = current_cells(1:index_of_interest-1);
+                after_replacement = current_cells(index_of_interest+sum(adj_matrix(:,i)):size(current_cells,2));
                 current_cells = [before_replacement, replacement, after_replacement];
                 
             % 3d. A new connection formed from an obstacle: IN condition
