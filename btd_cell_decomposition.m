@@ -45,6 +45,7 @@ for col = 1:size(occupancy_map,2)
         %% 3. Connection(s) present in current or last slice
         % Compare slices using adjacency matrix
         adj_matrix = connections_adjacency(last_connections,connections);
+        changes = 0;
 
         % Compare slices left to right using adjacency matrix row
         for i = 1:size(adj_matrix,1)
@@ -67,6 +68,7 @@ for col = 1:size(occupancy_map,2)
                 before_split = current_cells(1:index_of_interest-1);
                 after_split = current_cells(index_of_interest+1:end);
                 current_cells = [before_split,split,after_split];
+                changes = changes + (sum(adj_matrix(i,:))-1);
                 
             % 3b. The connection does not split or join (dead end)
             elseif sum(adj_matrix(i,:)) == 0
@@ -76,6 +78,7 @@ for col = 1:size(occupancy_map,2)
                 
                 % Remove the cell from the current cells array
                 current_cells(index_of_interest) = [];
+                changes = changes - 1;
             end
         end
 
@@ -84,13 +87,14 @@ for col = 1:size(occupancy_map,2)
             % 3c. The connection joined: OUT condition
             if sum(adj_matrix(:,i)) > 1
                 % Find the join index
-                for j = 1:size(adj_matrix,1)
-                    if adj_matrix(j,i) == 1
-                        cell_of_interest = last_cells(j);
-                        break
-                    end
-                end
-                index_of_interest = find(current_cells==cell_of_interest);
+%                 for j = 1:size(adj_matrix,1)
+%                     if adj_matrix(j,i) == 1
+%                         cell_of_interest = last_cells(j);
+%                         break
+%                     end
+%                 end
+%                 index_of_interest = find(current_cells==cell_of_interest);
+                index_of_interest = i - changes;  % offset index with changes
                 
                 % Track new cells (replaces other cells this time)
                 cell_counter = cell_counter + 1;
@@ -101,6 +105,7 @@ for col = 1:size(occupancy_map,2)
                 before_join = current_cells(1:index_of_interest-1);
                 after_join = current_cells(index_of_interest+sum(adj_matrix(:,i)):end);
                 current_cells = [before_join, join, after_join];
+                changes = changes - (sum(adj_matrix(:,i))-1);
                 
             % 3d. A new connection formed from an obstacle: IN condition
             elseif sum(adj_matrix(:,i)) == 0
@@ -116,6 +121,7 @@ for col = 1:size(occupancy_map,2)
                 before_insert = current_cells(1:index_of_interest-1);
                 after_insert = current_cells(index_of_interest:end);
                 current_cells = [before_insert, insert, after_insert];
+                changes = changes + 1;
             end
         end
     end
@@ -138,6 +144,7 @@ for col = 1:size(occupancy_map,2)
     last_connections = connections;
     last_cells = current_cells;
     last_slice = slice;
+    col
     
 end
 
