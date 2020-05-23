@@ -94,7 +94,7 @@ for col = 1:size(occupancy_map,2)
 %                     end
 %                 end
 %                 index_of_interest = find(current_cells==cell_of_interest);
-                index_of_interest = i - changes;  % offset index with changes
+                index_of_interest = i;  % offset index with changes
                 
                 % Track new cells (replaces other cells this time)
                 cell_counter = cell_counter + 1;
