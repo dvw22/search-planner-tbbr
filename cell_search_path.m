@@ -12,29 +12,35 @@ cell_waypoints = cell_indices;  % [x1,y1; x2,y2; ...]
 
 %% Populate with matrix indices
 
-% start at bottom left
+% Start at bottom left
 cell_indices(1,:) = floor_idx(1,:);
-
-% Initialise different rate counter
-j = 1;
-
-for i = 2:4:num_indices-1
     
-    % Add two next ceiling points
-    cell_indices(i,:) = ceiling_idx(j,:);
-    cell_indices(i+1,:) = ceiling_idx(j+1,:);
+% Initialise
+add_ceilings = true;
+j = 1;  % different rate counter
 
-    % Add two next floor points
-    cell_indices(i+2,:) = floor_idx(j+1,:);
-    cell_indices(i+3,:) = floor_idx(j+2,:);
-    
-    % Update different rate counter
-    j = j+2;
+for i = 2:2:num_indices-2
+    if add_ceilings == true
+        % Add two next ceiling points
+        cell_indices(i,:) = ceiling_idx(j,:);
+        cell_indices(i+1,:) = ceiling_idx(j+1,:);
+        add_ceilings = false;  % add floors next
+    elseif add_ceilings == false
+        % Add two next floor points
+        cell_indices(i,:) = floor_idx(j+1,:);
+        cell_indices(i+1,:) = floor_idx(j+2,:);
+        add_ceilings = true;  % add ceilings next
+        j = j+2;  % update different rate counter for next set
+    end 
     
 end
 
-% end at top right
-cell_indices(num_indices,:) = ceiling_idx(num_ceiling,:);
+% end with last ceiling/floor
+if add_ceilings == true
+    cell_indices(num_indices,:) = ceiling_idx(num_ceiling,:);
+elseif add_ceilings == false
+    cell_indices(num_indices,:) = floor_idx(num_ceiling,:);
+end
 
 %% Convert from matrix indices [row, col] to map waypoints [x, y]
 
