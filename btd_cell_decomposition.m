@@ -43,6 +43,7 @@ for col = 1:size(occupancy_map,2)
         adj_matrix = connections_adjacency(last_connections,connections);
         insertion = [];
         replacement = [];
+        changes = 0;  % tracks how many elements have been lost/gained in the current_cells
 
         % Compare slices left to right using adjacency matrix row
         for i = 1:size(adj_matrix,1)
@@ -66,8 +67,9 @@ for col = 1:size(occupancy_map,2)
             % The connection does not split or join (dead end)
             elseif sum(adj_matrix(i,:)) == 0
                 % Remove the cell from the current cells array
-                before_removal = current_cells(1:i-1);
-                after_removal = current_cells(i+1:size(current_cells,2));
+                changes = changes - 1;
+                before_removal = current_cells(1:(i+changes)-1);
+                after_removal = current_cells((i+changes)+1:size(current_cells,2));
                 current_cells = [before_removal, after_removal];
                 
             end
@@ -118,6 +120,8 @@ for col = 1:size(occupancy_map,2)
     %% Store previous states
     last_connectivity = connectivity;
     last_connections = connections;
+    last_slice = slice;
+    debug_slices = [last_slice, slice];
     
 end
 
