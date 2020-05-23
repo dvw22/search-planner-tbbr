@@ -1,4 +1,4 @@
-function [search_result] = simulate_static_search(init_pose, opi, decomposed_map, resolution, num_cell)
+function [search_result] = simulate_static_search(init_pose, opi, num_cell)
 %simulate_static_search Simulates a mobile robot statically executing a search path on the map.
 %   Detailed explanation goes here
 
@@ -43,6 +43,7 @@ pose(:,1) = init_pose;          % Add initial condition
 % decompose map
 
 % waypoints initialise
+controller.Waypoints = search_path;
 cell = 1;
 new_cell = true;
 
@@ -53,7 +54,6 @@ for i = 2:numel(time_vector)    % start index at 2nd element
     if new_cell == true
         % Get boustrophedon waypoints for new cell
         search_path = cell_search_path(decomposed_map, cell, resolution);
-        controller.Waypoints = search_path;
         new_cell = false;
     end
     
