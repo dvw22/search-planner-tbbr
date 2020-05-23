@@ -30,7 +30,7 @@ for col = 1:size(occupancy_map,2)
             current_cells = [current_cells, cell_counter];  % append cells
         end
         
-    %% 2. Check if we are still in a full obstacle slice
+    %% 2. Check if we are in a full obstacle slice
     elseif connectivity == 0
         % No cells in full obstacle slice
         current_cells = [];
