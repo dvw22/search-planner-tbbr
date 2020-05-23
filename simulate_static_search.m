@@ -26,6 +26,7 @@ controller = controllerPurePursuit;
 controller.LookaheadDistance = 0.5;
 controller.DesiredLinearVelocity = 0.75;
 controller.MaxAngularVelocity = 1.5;
+waypoint_radius = 0.5;
 
 %% Simulation Loop Setup
 
@@ -38,23 +39,30 @@ time_vector = 0:sample_time:end_time;
 pose = zeros(3,numel(time_vector));   % Initialise array, [x, y, theta] x time vector
 pose(:,1) = init_pose;          % Add initial condition
 
-%% New stuff
-
-% decompose map
-
-% waypoints initialise
+% Search waypoint indexing
 cell = 1;
+waypoint_idx = 1;
 new_cell = true;
+new_waypoint = true;
 
 %% Simulation Loop
 rate = rateControl(1/sample_time);
 for i = 2:numel(time_vector)    % start index at 2nd element
-    % get new waypoints for cell if starting a new cell
+    % Get new search path for cell if starting a new cell
     if new_cell == true
         % Get boustrophedon waypoints for new cell
+        waypoint_idx = 0;  % reset waypoint index
         search_path = cell_search_path(decomposed_map, cell, resolution);
-        controller.Waypoints = search_path;
+        num_waypoints = size(search_path,1);
         new_cell = false;
+    end
+    
+    % Get new waypoint from cell search path
+    if new_waypoint == true
+        waypoint_idx = waypoint_idx + 1;
+        waypoint = search_path(waypoint_idx,:);
+        controller.Waypoints = waypoint;
+        new_waypoint = false;
     end
     
     % Run the Pure Pursuit controller and convert output to wheel speeds
@@ -71,7 +79,7 @@ for i = 2:numel(time_vector)    % start index at 2nd element
     pose(:,i) = pose(:,i-1) + world_distance;    % Calculate new pose
     
     % Update visualization
-    viz(pose(:,i),search_path,opi)
+    viz(pose(:,i),controller.Waypoints,opi)
     waitfor(rate);
     
     % Check if OPI is found
@@ -82,27 +90,37 @@ for i = 2:numel(time_vector)    % start index at 2nd element
         break;
     end
     
-    % End simulation if last waypoint is reached
-    dist_between = [pose(1,i),pose(2,i);search_path(end,1),search_path(end,2)];
-    if pdist(dist_between,'euclidean') < 0.1    % search ends if robot within 0.1m radius of waypoint
-        % End simulation if last waypoint is reached
-        if cell == num_cell
+    % New event if end of waypoint is reached
+    dist_between = [pose(1,i),pose(2,i);search_path(waypoint_idx,1),search_path(waypoint_idx,2)];
+    if pdist(dist_between,'euclidean') < waypoint_radius    % waypoint reached if within radius
+        % Update
+        disp('Waypoint reached.')
+        
+        % Check if the last cell waypoint has been reached
+        if waypoint_idx == num_waypoints
             % Update
-            disp('End of search path reached. Ending search.');
+            disp('End of cell search path reached.')
             
-            % End search
-            search_result = false;
-            break;
+            % Check if the last cell has been searched
+            if cell == num_cell
+                % Update
+                disp('End of complete search path reached. Ending search.');
             
-        % Move on to next cell
+                % End search
+                search_result = false;
+                break;
+            else
+                % Reset and prepare
+                new_waypoint = true;  % start new waypoint
+                new_cell = true;  % start new cell
+                cell = cell + 1;           
+            end
+            
         else
-            % Update
-            disp('End of cell search path reached.');
-            
-            % Start new cell
-            new_cell = true;
-            cell = cell + 1;  % later this should be solved with TSP
+            % Move to next waypoint
+            new_waypoint = true;
         end
+        
     end 
     
 end
