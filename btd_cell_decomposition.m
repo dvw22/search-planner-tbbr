@@ -72,6 +72,9 @@ for col = 1:size(occupancy_map,2)
                 after_split = current_cells(index_of_interest+1:end);
                 current_cells = [before_split,split,after_split];
                 
+                % Update graph
+                reeb_graph = reeb_graph.addnode(size(split,2));
+                
             % 3b. The connection does not split or join (dead end)
             elseif sum(adj_matrix(i,:)) == 0
                 % Find the removal index
@@ -100,6 +103,9 @@ for col = 1:size(occupancy_map,2)
                 after_join = current_cells(index_of_interest+sum(adj_matrix(:,i)):end);
                 current_cells = [before_join, join, after_join];
                 
+                % Update graph
+                reeb_graph = reeb_graph.addnode(1);
+                
             % 3d. A new connection formed from an obstacle: IN condition
             elseif sum(adj_matrix(:,i)) == 0
                 % Find the insert index
@@ -114,6 +120,10 @@ for col = 1:size(occupancy_map,2)
                 before_insert = current_cells(1:index_of_interest-1);
                 after_insert = current_cells(index_of_interest:end);
                 current_cells = [before_insert, insert, after_insert];
+                
+                % Update graph
+                reeb_graph = reeb_graph.addnode(1);
+                
             end
         end
     end
