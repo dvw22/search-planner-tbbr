@@ -91,21 +91,34 @@ for col = 1:size(occupancy_map,2)
         for i = 1:size(adj_matrix,2)
             % 3c. The connection joined: OUT condition
             if sum(adj_matrix(:,i)) > 1
+                % Reset the joined cells
+                joined = [];
+                
                 % Find the join index
                 index_of_interest = i;
                 
-                % Track new cells (replaces other cells this time)
+                % Track the cells being joined
+                for j = 1:size(adj_matrix,1)
+                    if adj_matrix(j,i) == 1
+                        for k = 0:sum(adj_matrix(:,i))-1
+                            joined = [joined, last_cells(j+k)];
+                        end
+                        break
+                    end
+                end
+                
                 cell_counter = cell_counter + 1;
-                join = cell_counter;
+                joint = cell_counter;
                 
                 % Replace cells that joined with new cell and update
                 % current_cell matrix
                 before_join = current_cells(1:index_of_interest-1);
                 after_join = current_cells(index_of_interest+sum(adj_matrix(:,i)):end);
-                current_cells = [before_join, join, after_join];
+                current_cells = [before_join, joint, after_join];
                 
                 % Update graph
                 reeb_graph = addnode(reeb_graph,1);
+                reeb_graph = addedge(reeb_graph,joined,joint);
                 
             % 3d. A new connection formed from an obstacle: IN condition
             elseif sum(adj_matrix(:,i)) == 0
