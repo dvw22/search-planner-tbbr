@@ -36,4 +36,4 @@ end
 %                3,6];
 
 %% Simulate Search
-result = simulate_static_search(initial_pose, search_path, opi);
+% result = simulate_static_search(initial_pose, search_path, opi);
