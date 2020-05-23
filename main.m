@@ -20,22 +20,17 @@ resolution = map.Resolution;
 
 % [area, num_cells] = unoccupied_area(map);
 
-%% Compute Search Path
+%% Decompose Map
 % Perform cell decomposition on map
 [decomposed_map, num_cells] = btd_cell_decomposition(bi_occ_map);
 display_decomposed_map(decomposed_map)
 
-% Get boustrophedon waypoints for cell
-search_path = [];
+%% Simulate Search
 for cell = 1:num_cells
-    search_path = [search_path; cell_search_path(decomposed_map, cell, resolution)];
+    % Get boustrophedon waypoints for cell
+    search_path = cell_search_path(decomposed_map, cell, resolution);
+    
+    % Simulate
+    result = simulate_static_search(initial_pose, search_path, opi);
 end
 % search_path = cell_search_path(decomposed_map, 10, resolution);
-
-% search_path = [2.5,2;
-%                3,3;
-%                1,5;
-%                3,6];
-
-%% Simulate Search
-result = simulate_static_search(initial_pose, search_path, opi);
