@@ -7,7 +7,9 @@ function [cell_waypoints] = cell_search_path(decomposed_map,cell)
 num_ceiling = size(ceiling_idx,1);
 num_waypoints = num_ceiling*2;
 
-cell_waypoints = zeros(num_waypoints,2);
+cell_waypoints = zeros(num_waypoints,2);  % [x1,y1; x2,y2; ...]
+
+%% Populate with matrix indices
 
 % start at bottom left
 cell_waypoints(1,:) = floor_idx(1,:);

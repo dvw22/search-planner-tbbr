@@ -37,8 +37,8 @@ for col = 1:cell_length
     % Look down through each row until top of cell is found in column slice
     for i = 1:size(truncated_cell,1)
         if truncated_cell(i,col)==1
-            cell_ceiling_idx(col,1) = i + ceiling_offset;  % store x index
-            cell_ceiling_idx(col,2) = col + leftwall_offset;  % store y index
+            cell_ceiling_idx(col,1) = col + leftwall_offset;  % store x index
+            cell_ceiling_idx(col,2) = i + ceiling_offset;  % store y index
             break
         end
     end
@@ -47,8 +47,8 @@ for col = 1:cell_length
     % slice
     for i = size(truncated_cell,1):-1:1
         if truncated_cell(i,col)==1
-            cell_floor_idx(col,1) = i + ceiling_offset;  % store x index
-            cell_floor_idx(col,2) = col + leftwall_offset;  % store y index
+            cell_floor_idx(col,1) = col + leftwall_offset;  % store x index
+            cell_floor_idx(col,2) = i + ceiling_offset;  % store y index
             break
         end
     end

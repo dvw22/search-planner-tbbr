@@ -1,11 +1,8 @@
-function [search_result] = simulate_static_search(init_pose, search_path)
+function [search_result] = simulate_static_search(init_pose, search_path, opi)
 %simulate_static_search Simulates a mobile robot statically executing a search path on the map.
 %   Detailed explanation goes here
 
 %% Environment Setup
-% Define OPI
-opi = [4, 8, 1];        % [x, y, label]
-
 % Object Detector sensor
 detector = ObjectDetector;
 detector.fieldOfView = pi/4;    % [rad]
