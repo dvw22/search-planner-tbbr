@@ -80,9 +80,7 @@ for col = 1:size(occupancy_map,2)
                 index_of_interest = find(current_cells==cell_of_interest);
                 
                 % Remove the cell from the current cells array
-                before_removal = current_cells(1:index_of_interest-1);
-                after_removal = current_cells(index_of_interest+1:size(current_cells,2));
-                current_cells = [before_removal, after_removal];
+                current_cells(index_of_interest) = [];
                 
             end
         end
