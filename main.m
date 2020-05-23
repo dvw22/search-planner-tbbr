@@ -2,7 +2,7 @@ clear
 
 %% Setup
 % Physical
-initial_pose = [1,1,0];  % [x, y, theta]
+initial_pose = [0.75,0.75,pi/2];  % [x, y, theta]
 opi = [8, 8, 1];  % [x, y, label]
 
 % Map
