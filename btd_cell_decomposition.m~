@@ -32,7 +32,7 @@ for col = 1:size(occupancy_map,2)
         end
         
         % Update graph
-        reeb_graph = reeb_graph.addnode(size(current_cells,2));
+        reeb_graph = reeb_graph.addnode(size(
         
     %% 2. Check if we are in a full obstacle slice
     elseif connectivity == 0

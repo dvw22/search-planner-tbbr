@@ -26,4 +26,4 @@ resolution = map.Resolution;
 display_decomposed_map(decomposed_map)
 
 %% Simulate Search
-result = simulate_static_search(initial_pose, opi, decomposed_map, resolution, num_cells);
+% result = simulate_static_search(initial_pose, opi, decomposed_map, resolution, num_cells);
