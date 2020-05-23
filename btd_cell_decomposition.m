@@ -100,7 +100,7 @@ for col = 1:size(occupancy_map,2)
                 % Replace cells that merged with new cell and update
                 % current_cell matrix
                 before_replacement = current_cells(1:index_of_interest-1);
-                after_replacement = current_cells(index_of_interest+sum(adj_matrix(:,i)):size(current_cells,2));
+                after_replacement = current_cells(index_of_interest+sum(adj_matrix(:,i)):end);
                 current_cells = [before_replacement, replacement, after_replacement];
                 
             % 3d. A new connection formed from an obstacle: IN condition
