@@ -87,14 +87,7 @@ for col = 1:size(occupancy_map,2)
             % 3c. The connection joined: OUT condition
             if sum(adj_matrix(:,i)) > 1
                 % Find the join index
-%                 for j = 1:size(adj_matrix,1)
-%                     if adj_matrix(j,i) == 1
-%                         cell_of_interest = last_cells(j);
-%                         break
-%                     end
-%                 end
-%                 index_of_interest = find(current_cells==cell_of_interest);
-                index_of_interest = i;  % offset index with changes
+                index_of_interest = i;
                 
                 % Track new cells (replaces other cells this time)
                 cell_counter = cell_counter + 1;
@@ -144,7 +137,6 @@ for col = 1:size(occupancy_map,2)
     last_connections = connections;
     last_cells = current_cells;
     last_slice = slice;
-    col
     
 end
 
