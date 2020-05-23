@@ -1,4 +1,4 @@
-function [cell_waypoints] = cell_search_path(decomposed_map,cell)
+function [cell_waypoints] = cell_search_path(decomposed_map,cell,resolution)
 % cell_search path Generates a search path within a cell
 %   Detailed explanation goes here
 
@@ -34,6 +34,11 @@ end
 
 % end at top right
 cell_waypoints(num_waypoints,:) = ceiling_idx(num_ceiling,:);
+
+%% Convert from matrix indices to map waypoints [x, y]
+
+% Perform scaling for resolution
+cell_waypoints = cell_waypoints/resolution;
 
 end
 

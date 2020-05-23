@@ -1,15 +1,15 @@
 clear
 
 %% Setup
-% Mobile Robot
-initial_pose = [2,2,0];     % [x, y, theta]
-
+% Physical
+initial_pose = [2,2,0];  % [x, y, theta]
 opi = [8, 8, 1];  % [x, y, label]
 
 % Map
 load exampleMap;
 occ_map = occupancyMatrix(map);
 bi_occ_map = round(occ_map);  % convert to binary
+resolution = map.Resolution;
 % [area, num_cells] = unoccupied_area(map);
 
 % % Map
@@ -24,7 +24,7 @@ bi_occ_map = round(occ_map);  % convert to binary
 display_decomposed_map(decomposed_map)
 
 % Get boustrophedon waypoints for cell
-search_path = cell_search_path(decomposed_map, 1);
+search_path = cell_search_path(decomposed_map, 1, resolution);
 
 % search_path = [2.5,2;
 %                3,3;
