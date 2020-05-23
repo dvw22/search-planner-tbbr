@@ -105,14 +105,18 @@ for col = 1:size(occupancy_map,2)
                 
             % 3d. A new connection formed from an obstacle: IN condition
             elseif sum(adj_matrix(:,i)) == 0
+                % Find the replacement index
+                cell_of_interest = last_cells(i-1);  % find the number of the cell
+                index_of_interest = find(current_cells==cell_of_interest)+1;
+                
                 % add just one count to the cell_counter
                 cell_counter = cell_counter + 1;
                 insertion = cell_counter;
                 
                 % insert this new cell in the correct place in current_cell
                 % array
-                before_insertion = current_cells(1:i-1);
-                after_insertion = current_cells(i:size(current_cells,2));
+                before_insertion = current_cells(1:index_of_interest-1);
+                after_insertion = current_cells(index_of_interest:end);
                 current_cells = [before_insertion, insertion, after_insertion];
             end
         end
