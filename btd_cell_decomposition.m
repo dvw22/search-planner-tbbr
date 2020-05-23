@@ -72,6 +72,7 @@ for col = 1:size(occupancy_map,2)
                 before_insertion = current_cells(1:index_of_interest-1);
                 after_insertion = current_cells(index_of_interest+1:end);
                 current_cells = [before_insertion,insertion,after_insertion];
+                changes = changes + (sum(adj_matrix(i,:))-1);
                 
             % 3b. The connection does not split or join (dead end)
             elseif sum(adj_matrix(i,:)) == 0
@@ -81,7 +82,7 @@ for col = 1:size(occupancy_map,2)
                 
                 % Remove the cell from the current cells array
                 current_cells(index_of_interest) = [];
-                
+                changes = changes - 1;
             end
         end
 
@@ -90,7 +91,12 @@ for col = 1:size(occupancy_map,2)
             % 3c. The connection joined: OUT condition
             if sum(adj_matrix(:,i)) > 1
                 % Find the replacement index
-                cell_of_interest = last_cells(i);  % find the number of the cell
+                for j = 1:size(adj_matrix,1)
+                    if adj_matrix(j,i) == 1
+                        cell_of_interest = last_cells(j);
+                        break
+                    end
+                end
                 index_of_interest = find(current_cells==cell_of_interest);
                 
                 % Track new cells (replaces other cells this time)
@@ -102,12 +108,12 @@ for col = 1:size(occupancy_map,2)
                 before_replacement = current_cells(1:index_of_interest-1);
                 after_replacement = current_cells(index_of_interest+sum(adj_matrix(:,i)):end);
                 current_cells = [before_replacement, replacement, after_replacement];
+                changes = changes - (sum(adj_matrix(:,i))-1);
                 
             % 3d. A new connection formed from an obstacle: IN condition
             elseif sum(adj_matrix(:,i)) == 0
                 % Find the replacement index
-                cell_of_interest = last_cells(i-1);  % find the number of the cell
-                index_of_interest = find(current_cells==cell_of_interest)+1;
+                index_of_interest = i;
                 
                 % add just one count to the cell_counter
                 cell_counter = cell_counter + 1;
@@ -118,6 +124,7 @@ for col = 1:size(occupancy_map,2)
                 before_insertion = current_cells(1:index_of_interest-1);
                 after_insertion = current_cells(index_of_interest:end);
                 current_cells = [before_insertion, insertion, after_insertion];
+                changes = changes + 1;
             end
         end
     end
