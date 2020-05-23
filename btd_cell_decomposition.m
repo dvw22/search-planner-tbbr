@@ -1,4 +1,4 @@
-function [decomposed_map, cell_counter] = btd_cell_decomposition(occupancy_map)
+function [decomposed_map, reeb_graph, cell_counter] = btd_cell_decomposition(occupancy_map)
 % btd_cell_decomposition Uses boustrophedon cell decomposition to output a
 % region divided occupancy map
 %   The occupancy map must have a border of occupied cells for it to work.

@@ -6,8 +6,8 @@ initial_pose = [0.75,0.75,pi/2];  % [x, y, theta]
 opi = [8, 8, 1];  % [x, y, label]
 
 % Map
-% load exampleMap;
-load complexMap;
+load exampleMap;
+% load complexMap;
 occ_map = occupancyMatrix(map);
 bi_occ_map = round(occ_map);  % convert to binary
 resolution = map.Resolution;
@@ -22,7 +22,7 @@ resolution = map.Resolution;
 
 %% Decompose Map
 % Perform cell decomposition on map
-[decomposed_map, num_cells] = btd_cell_decomposition(bi_occ_map);
+[decomposed_map, graph, num_cells] = btd_cell_decomposition(bi_occ_map);
 display_decomposed_map(decomposed_map)
 
 %% Simulate Search
