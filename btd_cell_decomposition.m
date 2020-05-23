@@ -10,7 +10,8 @@ decomposed_map = zeros(size(occupancy_map));
 last_connectivity = 0;
 last_connections = [];
 cell_counter = 0;  % tracks the number of cells total
-current_cells = [];  % tracks which cells are in a slice
+last_cells = [];  % tracks which cells were in the last slice
+current_cells = [];  % tracks which cells are in the current slice
 
 for col = 1:size(occupancy_map,2)
     %% Check connectivity of the slice
@@ -57,6 +58,10 @@ for col = 1:size(occupancy_map,2)
                 
             % 3a. The connection split: IN condition
             if sum(adj_matrix(i,:)) > 1
+                % Find the replacement index
+                cell_of_interest = last_cells(i);  % find the number of the cell
+                index_of_interest = find(current_cells==cell_of_interest);
+                
                 % Check how many new cells are produced and track
                 for j = 1:sum(adj_matrix(i,:))
                     cell_counter = cell_counter + 1;
@@ -65,8 +70,8 @@ for col = 1:size(occupancy_map,2)
                 
                 % Insert the new cells in order into the current cells
                 % array
-                before_insertion = current_cells(1:i-1);
-                after_insertion = current_cells(i+1:size(current_cells,2));
+                before_insertion = current_cells(1:index_of_interest-1);
+                after_insertion = current_cells(index_of_interest+1:size(current_cells,2));
                 current_cells = [before_insertion,insertion,after_insertion];
                 
             % 3b. The connection does not split or join (dead end)
@@ -124,6 +129,7 @@ for col = 1:size(occupancy_map,2)
     %% Store previous states
     last_connectivity = connectivity;
     last_connections = connections;
+    last_cells = current_cells;
     last_slice = slice;
     debug_slices = [last_slice, slice];
     
