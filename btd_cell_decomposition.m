@@ -49,7 +49,6 @@ for col = 1:size(occupancy_map,2)
         % Initialise
         insertion = [];
         replacement = [];
-        changes = 0;  % tracks how many elements have been lost/gained in the current_cells
 
         % Compare slices left to right using adjacency matrix row
         for i = 1:size(adj_matrix,1)
@@ -72,7 +71,6 @@ for col = 1:size(occupancy_map,2)
                 before_insertion = current_cells(1:index_of_interest-1);
                 after_insertion = current_cells(index_of_interest+1:end);
                 current_cells = [before_insertion,insertion,after_insertion];
-                changes = changes + (sum(adj_matrix(i,:))-1);
                 
             % 3b. The connection does not split or join (dead end)
             elseif sum(adj_matrix(i,:)) == 0
@@ -82,7 +80,6 @@ for col = 1:size(occupancy_map,2)
                 
                 % Remove the cell from the current cells array
                 current_cells(index_of_interest) = [];
-                changes = changes - 1;
             end
         end
 
@@ -108,7 +105,6 @@ for col = 1:size(occupancy_map,2)
                 before_replacement = current_cells(1:index_of_interest-1);
                 after_replacement = current_cells(index_of_interest+sum(adj_matrix(:,i)):end);
                 current_cells = [before_replacement, replacement, after_replacement];
-                changes = changes - (sum(adj_matrix(:,i))-1);
                 
             % 3d. A new connection formed from an obstacle: IN condition
             elseif sum(adj_matrix(:,i)) == 0
@@ -124,7 +120,6 @@ for col = 1:size(occupancy_map,2)
                 before_insertion = current_cells(1:index_of_interest-1);
                 after_insertion = current_cells(index_of_interest:end);
                 current_cells = [before_insertion, insertion, after_insertion];
-                changes = changes + 1;
             end
         end
     end
