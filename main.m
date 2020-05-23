@@ -4,17 +4,17 @@ clear
 % Mobile Robot
 initial_pose = [2,2,0];     % [x, y, theta]
 
-% % Map
-% load exampleMap;
-% occ_map = occupancyMatrix(map);
-% bi_occ_map = round(occ_map);  % convert to binary
-% % [area, num_cells] = unoccupied_area(map);
-
 % Map
-load OccupancyMap;
-occ_map = occVal;
+load exampleMap;
+occ_map = occupancyMatrix(map);
 bi_occ_map = round(occ_map);  % convert to binary
 % [area, num_cells] = unoccupied_area(map);
+
+% % Map
+% load OccupancyMap;
+% occ_map = occVal;
+% bi_occ_map = round(occ_map);  % convert to binary
+% % [area, num_cells] = unoccupied_area(map);
 
 %% Compute Search Path
 % Perform cell decomposition on map

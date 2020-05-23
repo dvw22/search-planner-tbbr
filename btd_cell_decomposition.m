@@ -59,9 +59,8 @@ for col = 1:size(occupancy_map,2)
                 
                 % Insert the new cells in order into the current cells
                 % array
-                changes = changes + sum(adj_matrix(i,:));  % cells have been added
-                before_insertion = current_cells(1:(i+changes)-1);
-                after_insertion = current_cells((i+changes)+1:size(current_cells,2));
+                before_insertion = current_cells(1:i-1);
+                after_insertion = current_cells(i+1:size(current_cells,2));
                 current_cells = [before_insertion,insertion,after_insertion];
                 
             % The connection does not split or join (dead end)
