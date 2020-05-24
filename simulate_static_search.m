@@ -48,8 +48,8 @@ num_segments = size(segment_idx,1);
 %% Simulation Loop
 rate = rateControl(1/sample_time);
 for i = 2:numel(time_vector)    % start index at 2nd element
-    %% Cell Sequence Updating
-    % Get new search path for cell if starting a new cell
+    %% Segment Updating
+    % Get new search path if starting a new segment
     if new_segment == true
         % Get new segment
         seg_start_idx = segment_idx(segment,1);
@@ -57,7 +57,7 @@ for i = 2:numel(time_vector)    % start index at 2nd element
         search_path = map_waypoints(seg_start_idx:seg_end_idx,:);
         
         % Update indices and flag
-        segment = segment + 1;  % move to next cell sequence next time
+        segment = segment + 1;  % move to next segment next time
         waypoint_idx = 1;  % reset waypoint index
         new_segment = false;
         
@@ -114,14 +114,14 @@ for i = 2:numel(time_vector)    % start index at 2nd element
     % Waypoint reached if robot within radius
     if pdist(dist_between,'euclidean') < waypoint_radius    
         % Publish info
-        disp(['Waypoint ',num2str(waypoint_idx-1),'/',num2str(num_waypoints),' in cell sequence ',num2str(segment-1),'/',num2str(num_segments),' reached.'])
+        disp(['Waypoint ',num2str(waypoint_idx-1),'/',num2str(num_waypoints),' in segment ',num2str(segment-1),'/',num2str(num_segments),' reached.'])
                 
-        % Cell sequence complete
+        % Segment complete
         if waypoint_idx == num_waypoints
             % Publish info
-            disp('End of cell sequence search path reached.')
+            disp('End of segment reached.')
             
-            % Last cell sequence complete
+            % Last segment complete
             if segment == num_segments
                 % Publish info
                 disp('End of complete search path reached. Ending search.');
@@ -130,7 +130,7 @@ for i = 2:numel(time_vector)    % start index at 2nd element
                 search_result = false;
                 break;
             else
-                % Next cell sequence and waypoint flags
+                % Next segment and waypoint flags
                 new_waypoint = true;
                 new_segment = true;
             end
