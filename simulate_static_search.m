@@ -53,19 +53,19 @@ for i = 2:numel(time_vector)    % start index at 2nd element
         cell_seq = cell_order(cell_order_row,:);    
         cell_seq = cell_seq(:,any(cell_seq,1));  % remove zeros to truncate cell sequence
         
-        % Increment, reset and set flag
-        cell_order_row = cell_order_row + 1;
+        % Update indices and flag
+        cell_order_row = cell_order_row + 1;  % move to next cell sequence next time
         waypoint_idx = 0;  % reset waypoint index
-        search_path = [];  % uses appending method, can be specified later
         new_cell_seq = false;
         
-        % Get boustrophedon waypoints for new cell sequence
+        % Get boustrophedon waypoints (search path) for new cell sequence
+        search_path = [];  % reset search path
         for col = 1:size(cell_seq,2)
             cell_waypoints = cell_search_path(decomposed_map, cell_seq(col), resolution);
-            search_path = [search_path; cell_waypoints];
+            search_path = [search_path; cell_waypoints];  % uses appending method, can be indexed later
         end
         
-        % Get waypoint info
+        % Get search path size info
         num_waypoints = size(search_path,1);
     end
     
