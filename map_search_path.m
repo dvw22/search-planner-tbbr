@@ -13,7 +13,7 @@ num_cell_seq = size(cell_order,1);
 % Get waypoints for each cell sequence and path between and append
 for i = 1:2:num_cell_seq
     % Append cell sequence waypoints
-    cell_seq_waypoints = cell_seq_search_path(cell_order(i,:),decomposed_map,resolution);
+    [cell_seq_waypoints, num_cells] = cell_seq_search_path(cell_order(i,:),decomposed_map,resolution);
     map_waypoints = [map_waypoints; cell_seq_waypoints];
     
     % Save indices
@@ -21,7 +21,7 @@ for i = 1:2:num_cell_seq
     % Append travel waypoints
     if i < num_cell_seq
         % Get next cell sequence waypoints
-        next_cell_seq_waypoints = cell_seq_search_path(cell_order(i+1,:),decomposed_map,resolution);
+        [next_cell_seq_waypoints, num_cells] = cell_seq_search_path(cell_order(i+1,:),decomposed_map,resolution);
         
         % Get start and end points for travel
         start_point = cell_seq_waypoints(end,:);  % starting at end of last cell sequence
