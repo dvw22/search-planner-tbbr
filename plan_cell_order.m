@@ -4,18 +4,21 @@ function [cell_order] = plan_cell_order(decomposed_map, reeb_graph, num_cells)
 %   Detailed explanation goes here
 
 % Initialise
-cell_order = zeros(num_cells,1);
+cell_order = [];
 unsearched_cells = (1:num_cells);
 
 % Get starting cell number
 start = 1;
 cell = start;
-cell_order(1) = cell;
-cell_order_idx = 2;
+cell_order_idx = 1;
+cell_seq_idx = 2;
 unsearched_cells(start) = [];  % remove start cell
 
+cell_seq = zeros(1,num_cells);
+cell_seq(1) = start;
+
 % Continue while there are still unsearched cells
-while isempty(unsearched_cells) == 0
+while true
     % Initialise
     all_searched = true;
     
@@ -32,7 +35,7 @@ while isempty(unsearched_cells) == 0
                 cell = next_cells(i);
                 
                 % Update lists
-                cell_order(cell_order_idx) = cell;
+                cell_seq(cell_seq_idx) = cell;  % append to continuous cell sequence
                 unsearched_cells(find(unsearched_cells==cell)) = [];  % remove cell
                 break
             end
@@ -42,20 +45,45 @@ while isempty(unsearched_cells) == 0
         if all_searched == true
             % Add lowest unsearched cell
             cell = min(unsearched_cells);
+            
+            % Add sequence to cell order
+            cell_order = [cell_order; cell_seq];
+            cell_order_idx = cell_order_idx + 1;
+
+            % Reset cell sequence
+            cell_seq(1,:) = 0;  % clear sequence
+            cell_seq_idx = 1;  % restart index
+
+            % Add lowest unsearched cell
+            cell = min(unsearched_cells);
             unsearched_cells(find(unsearched_cells==cell)) = [];  % remove cell
-            cell_order(cell_order_idx) = cell;
+            cell_seq(cell_seq_idx) = cell;
         end     
         
     % The cell is a dead end
     else
+        % Add sequence to cell order
+        cell_order = [cell_order; cell_seq];
+        cell_order_idx = cell_order_idx + 1;
+        
+        % Reset cell sequence
+        cell_seq(1,:) = 0;  % clear sequence
+        cell_seq_idx = 1;  % restart index
+            
         % Add lowest unsearched cell
         cell = min(unsearched_cells);
         unsearched_cells(find(unsearched_cells==cell)) = [];  % remove cell
-        cell_order(cell_order_idx) = cell;
+        cell_seq(cell_seq_idx) = cell;
     end
     
     % Increment loop
-    cell_order_idx = cell_order_idx + 1;
+    cell_seq_idx = cell_seq_idx + 1;
+    
+    if isempty(unsearched_cells) == 1
+        % Add last cell
+        cell_order = [cell_order; cell_seq];
+        break
+    end
     
 end
 
