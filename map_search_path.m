@@ -14,7 +14,7 @@ last_end_idx = 0;
 start_idx = 1;
 
 % Get waypoints for each cell sequence and path between and append
-for i = 1:2:num_cell_seq
+for i = 1:num_cell_seq
     % Calculate waypoints before travel first time only
     if i == 1
         % Append cell sequence waypoints
@@ -56,6 +56,8 @@ for i = 1:2:num_cell_seq
         if isempty(travel_waypoints) == 0
             travel_waypoints(1,:) = [];  % Must clear source of travel to avoid duplicate
             travel_waypoints(end,:) = [];  % Must clear destination of travel to avoid duplicate
+        else
+            display(['Path planning failed between cell sequence ',num2str(i),' and ',num2str(i+1),'.'])
         end
         map_waypoints = [map_waypoints; travel_waypoints];
         
