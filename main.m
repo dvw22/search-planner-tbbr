@@ -25,5 +25,8 @@ resolution = map.Resolution;
 [decomposed_map, graph, num_cells] = btd_cell_decomposition(bi_occ_map);
 display_decomposed_map(decomposed_map)
 
+%% Plan Cell Order
+cell_order = plan_cell_order(graph, num_cells);
+
 %% Simulate Search
-% result = simulate_static_search(initial_pose, opi, decomposed_map, resolution, num_cells);
+result = simulate_static_search(initial_pose, opi, decomposed_map, resolution, cell_order);

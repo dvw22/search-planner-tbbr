@@ -1,4 +1,4 @@
-function [search_result] = simulate_static_search(init_pose, opi, decomposed_map, resolution, cell_order)
+function [search_result] = simulate_static_search(init_pose, opi, decomposed_map, resolution, num_cell)
 %simulate_static_search Simulates a mobile robot statically executing a search path on the map.
 %   Detailed explanation goes here
 
@@ -23,16 +23,16 @@ mobile_robot = DifferentialDrive(wheel_radius,wheel_base);
 
 % Path Following Controller
 controller = controllerPurePursuit;
-controller.LookaheadDistance = 0.5*0.5;
-controller.DesiredLinearVelocity = 0.75*2;
-controller.MaxAngularVelocity = 1.5*16;
+controller.LookaheadDistance = 0.5;
+controller.DesiredLinearVelocity = 0.75;
+controller.MaxAngularVelocity = 1.5;
 waypoint_radius = 0.5;
 
 %% Simulation Loop Setup
 
 % Time Array
 sample_time = 0.1;              % [s]
-end_time = 600;                  % Arbitrarily set to 10 minutes [s]
+end_time = 300;                  % Arbitrarily set to 5 minutes [s]
 time_vector = 0:sample_time:end_time;
 
 % Pose Array
@@ -40,24 +40,21 @@ pose = zeros(3,numel(time_vector));   % Initialise array, [x, y, theta] x time v
 pose(:,1) = init_pose;          % Add initial condition
 
 % Search waypoint indexing
+cell = 1;
+waypoint_idx = 1;
 cell_order_row = 1;
-new_cell_seq = true;
+new_cell = true;
 new_waypoint = true;
 
 %% Simulation Loop
 rate = rateControl(1/sample_time);
 for i = 2:numel(time_vector)    % start index at 2nd element
     % Get new search path for cell if starting a new cell
-    if new_cell_seq == true
-        % Get new cell sequence
-        cell_seq = cell_order(cell_order_row,:);    
-        cell_seq = cell_seq(:,any(cell_seq,1));  % remove zeros to truncate cell sequence
-        
-        % Increment, reset and set flag
-        cell_order_row = cell_order_row + 1;
+    if new_cell == true
+        % Set flag and reset
+        new_cell = false;
         waypoint_idx = 0;  % reset waypoint index
         search_path = [];  % uses appending method, can be specified later
-        new_cell_seq = false;
         
         % Get boustrophedon waypoints for new cell sequence
         for col = 1:size(cell_seq,2)
@@ -71,7 +68,6 @@ for i = 2:numel(time_vector)    % start index at 2nd element
     
     % Get new waypoint from cell search path
     if new_waypoint == true
-        % Increment, reset and set flag
         waypoint_idx = waypoint_idx + 1;
         waypoint = search_path(waypoint_idx,:);
         controller.Waypoints = waypoint;
@@ -109,13 +105,13 @@ for i = 2:numel(time_vector)    % start index at 2nd element
         % Update
         disp('Waypoint reached.')
         
-        % Check if the last cell sequence waypoint has been reached
+        % Check if the last cell waypoint has been reached
         if waypoint_idx == num_waypoints
             % Update
-            disp('End of cell sequence search path reached.')
+            disp('End of cell search path reached.')
             
-            % Check if the last cell sequence has been searched
-            if cell_order_row == size(cell_order,1)
+            % Check if the last cell has been searched
+            if cell == num_cell
                 % Update
                 disp('End of complete search path reached. Ending search.');
             
@@ -125,7 +121,8 @@ for i = 2:numel(time_vector)    % start index at 2nd element
             else
                 % Reset and prepare
                 new_waypoint = true;  % start new waypoint
-                new_cell_seq = true;  % start new cell
+                new_cell = true;  % start new cell
+                cell_seq = cell_order(cell_order_row);     
             end
             
         else
