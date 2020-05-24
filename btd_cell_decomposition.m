@@ -7,7 +7,7 @@ function [decomposed_map, reeb_graph, cell_counter] = btd_cell_decomposition(occ
 
 %% Initialise variables
 decomposed_map = zeros(size(occupancy_map));
-reeb_graph = graph;
+reeb_graph = digraph;
 last_connectivity = 0;
 last_connections = [];
 cell_counter = 0;  % tracks the number of cells total
