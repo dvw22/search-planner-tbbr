@@ -1,8 +1,39 @@
-function [map_waypoints,region_idx] = map_search_path(inputArg1,inputArg2)
-% map_search_path Outputs a full waypoint list with a region indices matrix
+function [map_waypoints,segment_idx] = map_search_path(cell_order,decomposed_map,resolution,prm)
+% map_search_path Outputs a full waypoint list with a segment indices matrix
 % to access segmented regions during the waypoint planning process.
-%   The segments are either a cell regi
-outputArg1 = inputArg1;
-outputArg2 = inputArg2;
+%   The segments are either a cell sequence path or a shortest path between
+%   cells.
+
+%% Waypoint Generation
+% Initialise
+map_waypoints = [];
+segment_idx = [];
+num_cell_seq = size(cell_order,1);
+
+% Get waypoints for each cell sequence and path between and append
+for i = 1::2:num_cell_seq
+    % Append cell sequence waypoints
+    cell_seq_waypoints = cell_seq_search_path(cell_order(i,:),decomposed_map,resolution);
+    map_waypoints = [map_waypoints, cell_seq_waypoints];
+    
+    % Save indices
+    
+    % Append travel waypoints
+    if i < num_cel_seq
+        % Get next cell sequence waypoints
+        cell_seq_waypoints = cell_seq_search_path(cell_order(i+1,:),decomposed_map,resolution);
+        
+        % Get start and end
+        
+        % Append cell sequence waypoints
+        travel_waypoints = findpath(prm,start,end);
+        map_waypoints = [map_waypoints, travel_waypoints];
+        
+        % Append next cell sequence waypoints
+        map_waypoints = [map_waypoints, cell_seq_waypoints];
+    
+    % Save indices
+    
+
 end
 

@@ -1,4 +1,4 @@
-function [cell_seq_waypoints] = cell_seq_search_path(cell_seq, decomposed_map, reso)
+function [cell_seq_waypoints] = cell_seq_search_path(cell_seq, decomposed_map, resolution)
 % cell_seq_search_path Outputs waypoints for a set of cells in an optimised order
 %   Gets a row in from a cell order plan matrix. Slices off zeroed
 %   elements. Inputs each element as a cell number to cell_search_path.
@@ -11,18 +11,12 @@ cell_seq = cell_seq(:,any(cell_seq,1));
 %% Waypoint Generation
 % Initialise
 cell_seq_waypoints = [];  % reset search path
-for i = 1:size(cell_seq,2)
-    % Update search path
-    cell_waypoints = cell_search_path(decomposed_map, cell_seq(i), resolution);
-    cell_seq_waypoints = [cell_seq_waypoints; cell_waypoints];  % uses appending method, can be indexed later
 
-    % Update cell tracking indices matrix
-    num_cell_waypoints = size(cell_waypoints,1);
-    idx_sum = idx_sum + num_cell_waypoints;
-    cell_end_idx = [cell_end_idx, idx_sum];  % track cell end indices
+% Get waypoints for each cell and append
+for i = 1:size(cell_seq,2)
+    cell_waypoints = cell_search_path(decomposed_map, cell_seq(i), resolution);
+    cell_seq_waypoints = [cell_seq_waypoints; cell_waypoints];  % uses appending method, can maybe be indexed later
 end
 
-outputArg1 = inputArg1;
-outputArg2 = inputArg2;
 end
 
