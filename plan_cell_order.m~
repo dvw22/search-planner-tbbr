@@ -5,7 +5,6 @@ function [cell_order] = plan_cell_order(decomposed_map, reeb_graph, num_cells)
 
 % Initialise
 cell_order = zeros(num_cells);
-skipped = [];
 
 % Get starting cell number
 start = 1;
@@ -15,21 +14,21 @@ for cell_order_idx = 1:num_cells
     % Initialise
     unsearched_neighbor = false;
     
-    % Get adjacent cells
-    adj_cells = neighbors(reeb_graph,cell);
-    
-    % Try find a neig that hasn't been visited
-    for i = 1:size(adj_cells,1)
-        % Cell hasn't been visited
-        if ismember(adj_cells(i),cell_order) == 0
-            unsearched_neighbor = true;
-            cell_order(list_idx) = adj_cells(i);
-            break  % greedy
-        end
+    % Check if there are next cells
+    if outdegree(reeb_graph,cell) > 0
+        % Store next cell
+        next_cells = successors(reeb_graph,cell);
+        cell = next_cells(1);  % ASSUMPTION: TAKE THE FIRST ALWAYS
+        
+        % Update
+        unsearched_neighbor = true;
+        cell_order(list_idx) = cell;
     end
     
-    
+    % No unsearched neighbours found. Move to lowest unsearched cell
     if unsearched_neighbor == false
+        
+    end
     
     
 end
