@@ -36,5 +36,8 @@ cell_order = plan_cell_order(graph, num_cells);
 %% Plan Search Path
 [map_waypoints, segment_idx] = map_search_path(cell_order,decomposed_map,resolution,planner,start_position);
 
+%% Plot Path
+plot(map_waypoints(:,1),map_waypoints(:,2),'-x')
+
 %% Simulate Search
-result = simulate_static_search(start_pose, opi, map_waypoints, segment_idx);
+% result = simulate_static_search(start_pose, opi, map_waypoints, segment_idx);
