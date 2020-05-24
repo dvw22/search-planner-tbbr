@@ -5,41 +5,59 @@ function [cell_order] = plan_cell_order(decomposed_map, reeb_graph, num_cells)
 
 % Initialise
 cell_order = zeros(num_cells,1);
-unsearched_cells = [1:num_cells];
+unsearched_cells = (1:num_cells);
 
 % Get starting cell number
 start = 1;
 cell = start;
 cell_order(1) = cell;
+cell_order_idx = 2;
 unsearched_cells(start) = [];  % remove start cell
 
-for cell_order_idx = 2:num_cells
+% Continue while there are still unsearched cells
+while isempty(unsearched_cells) == 0
     % Initialise
-    unsearched_neighbor = false;
+    all_searched = true;
     
-    % Check if there are next cells
+    % The cell is not a dead end
     if outdegree(reeb_graph,cell) > 0
-        % Store next cell
+        % Check successors
         next_cells = successors(reeb_graph,cell);
-        cell = next_cells(1);  % ASSUMPTION: TAKE THE FIRST ALWAYS
         
-        % Update
-        unsearched_neighbor = true;
-        unsearched_cells(find(unsearched_cells==cell)) = [];  % remove cell
-        cell_order(cell_order_idx) = cell;
-    end
-    
-    % No unsearched neighbours found. Move to lowest unsearched cell
-    if unsearched_neighbor == false
+        % Check if there is an unsearched successor
+        for i = 1:size(next_cells,2)
+            % A successor hasn't been searched yet
+            if find(unsearched_cells==next_cells(i))
+                all_searched = false;
+                cell = next_cells(i);
+                
+                % Update lists
+                cell_order(cell_order_idx) = cell;
+                unsearched_cells(find(unsearched_cells==cell)) = [];  % remove cell
+                break
+            end
+        end
+        
+        % All the successors have already been searched
+        if all_searched == true
+            % Add lowest unsearched cell
+            cell = min(unsearched_cells);
+            unsearched_cells(find(unsearched_cells==cell)) = [];  % remove cell
+            cell_order(cell_order_idx) = cell;
+        end     
+        
+    % The cell is a dead end
+    else
         % Add lowest unsearched cell
         cell = min(unsearched_cells);
         unsearched_cells(find(unsearched_cells==cell)) = [];  % remove cell
         cell_order(cell_order_idx) = cell;
     end
     
-end
-
+    % Increment loop
+    cell_order_idx = cell_order_idx + 1;
     
+end
 
 end
 
