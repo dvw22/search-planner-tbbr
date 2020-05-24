@@ -18,9 +18,14 @@ bi_occ_map = binaryOccupancyMap(bi_occ_matrix,resolution);
 % resolution = 1;
 
 % Physical
-initial_pose = [0.75,0.75,pi/2];  % [x, y, theta]
+start_pose = [0.75,0.75,pi/2];  % [x, y, theta]
+start_position = [start_pose(1), start_pose(2)];  % [x, y]
 opi = [8, 8, 1];  % [x, y, label]
+
+% Probabilistic Roadmap
 planner = mobileRobotPRM(bi_occ_map);
+planner.NumNodes = 75;
+planner.ConnectionDistance = 5;
 
 % [area, num_cells] = unoccupied_area(map);
 
@@ -33,7 +38,15 @@ display_decomposed_map(decomposed_map)
 cell_order = plan_cell_order(graph, num_cells);
 
 %% Plan Search Path
-[map_waypoints, segment_idx] = map_search_path(cell_order,decomposed_map,resolution,planner);
+[map_waypoints, segment_idx] = map_search_path(cell_order,decomposed_map,resolution,planner,start_position);
+
+%% Plot Path
+% Simulation Visualiser
+viz = Visualizer2D;
+viz.hasWaypoints = true;
+viz.mapName = 'map';
+
+% plot(map_waypoints(:,1),map_waypoints(:,2),'-x')
 
 %% Simulate Search
-result = simulate_static_search(initial_pose, opi, map_waypoints, segment_idx);
+% result = simulate_static_search(start_pose, opi, map_waypoints, segment_idx);
