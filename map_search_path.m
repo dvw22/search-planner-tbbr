@@ -15,18 +15,32 @@ start_idx = 1;
 
 % Get waypoints for each cell sequence and path between and append
 for i = 1:2:num_cell_seq
-    % Append cell sequence waypoints
-    [cell_seq_waypoints, num_cells] = cell_seq_search_path(cell_order(i,:),decomposed_map,resolution);
-    map_waypoints = [map_waypoints; cell_seq_waypoints];
+    % Calculate waypoints before travel first time only
+    if i == 1
+        % Append cell sequence waypoints
+        [cell_seq_waypoints, num_cells] = cell_seq_search_path(cell_order(i,:),decomposed_map,resolution);
+        map_waypoints = [map_waypoints; cell_seq_waypoints];
+
+        % Append cell sequence indices
+        num_waypoints = size(cell_seq_waypoints,1);
+        end_idx = last_end_idx + num_waypoints;
+        segment_idx = [segment_idx; [start_idx, end_idx]];
+        start_idx = end_idx + 1;  % store
+        last_end_idx = end_idx;  % store
+    % Just finished calculating a travel segment
+    else
+        % Append cell sequence waypoints
+        map_waypoints = [map_waypoints; cell_seq_waypoints];
+
+        % Append cell sequence indices
+        num_waypoints = size(cell_seq_waypoints,1);
+        end_idx = last_end_idx + num_waypoints;
+        segment_idx = [segment_idx; [start_idx, end_idx]];
+        start_idx = end_idx + 1;  % store
+        last_end_idx = end_idx;  % store
+    end
     
-    % Append cell sequence indices
-    num_waypoints = size(cell_seq_waypoints,1);
-    end_idx = last_end_idx + num_waypoints;
-    segment_idx = [segment_idx; [start_idx, end_idx]];
-    start_idx = end_idx + 1;  % store
-    last_end_idx = end_idx;  % store
-    
-    % Append travel and next cell sequence waypoints
+    % Append travel waypoints
     if i < num_cell_seq
         % Get next cell sequence waypoints
         [next_cell_seq_waypoints, num_cells] = cell_seq_search_path(cell_order(i+1,:),decomposed_map,resolution);
@@ -37,6 +51,12 @@ for i = 1:2:num_cell_seq
         
         % Append travel waypoints
         travel_waypoints = findpath(planner,start_waypoint,end_waypoint);
+        % The planner may not always find a path if the map is too complex.
+        % This condition is to prevent the code from breaking.
+        if isempty(travel_waypoints) == 0
+            travel_waypoints(1,:) = [];  % Must clear source of travel to avoid duplicate
+            travel_waypoints(end,:) = [];  % Must clear destination of travel to avoid duplicate
+        end
         map_waypoints = [map_waypoints; travel_waypoints];
         
         % Append travel indices
@@ -46,18 +66,9 @@ for i = 1:2:num_cell_seq
         start_idx = end_idx + 1;  % store
         last_end_idx = end_idx;  % store
         
-        % Append next cell sequence waypoints
-        map_waypoints = [map_waypoints; next_cell_seq_waypoints];
-    
-        % Append next cell sequence indices
-        num_waypoints = size(next_cell_seq_waypoints,1);
-        end_idx = last_end_idx + num_waypoints;
-        segment_idx = [segment_idx; [start_idx, end_idx]];
-        start_idx = end_idx + 1;  % store
-        last_end_idx = end_idx;  % store
-        
+        % Store next cell sequence waypoints
+        cell_seq_waypoints = next_cell_seq_waypoints;
     end
-    
 
 end
 

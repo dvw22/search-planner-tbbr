@@ -2,8 +2,8 @@ clear
 
 %% Setup
 % Occupancy matrix from map
-% load exampleMap;
-load complexMap;
+load exampleMap;
+% load complexMap;
 occ_matrix = occupancyMatrix(map);
 bi_occ_matrix = round(occ_matrix);  % convert to binary
 resolution = map.Resolution;

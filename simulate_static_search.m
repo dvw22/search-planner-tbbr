@@ -23,7 +23,7 @@ mobile_robot = DifferentialDrive(wheel_radius,wheel_base);
 
 % Path Following Controller
 controller = controllerPurePursuit;
-controller.LookaheadDistance = 0.5*0.5;
+controller.LookaheadDistance = 0.5*0.25;
 controller.DesiredLinearVelocity = 0.75*2;
 controller.MaxAngularVelocity = 1.5*16;
 waypoint_radius = 0.5;
