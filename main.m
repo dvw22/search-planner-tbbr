@@ -23,7 +23,7 @@ resolution = map.Resolution;
 %% Decompose Map
 % Perform cell decomposition on map
 [decomposed_map, graph, num_cells] = btd_cell_decomposition(bi_occ_map);
-display_decomposed_map(decomposed_map)
+% display_decomposed_map(decomposed_map)
 
 %% Plan Cell Order
 cell_order = plan_cell_order(graph, num_cells);
