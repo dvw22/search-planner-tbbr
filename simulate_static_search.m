@@ -39,7 +39,7 @@ time_vector = 0:sample_time:end_time;
 pose = zeros(3,numel(time_vector));   % Initialise array, [x, y, theta] x time vector
 pose(:,1) = init_pose;          % Add initial condition
 
-% Search waypoint indexing
+% Search waypoint indexing and flags
 cell_order_row = 1;
 new_cell_seq = true;
 new_waypoint = true;
@@ -55,7 +55,7 @@ for i = 2:numel(time_vector)    % start index at 2nd element
         
         % Update indices and flag
         cell_order_row = cell_order_row + 1;  % move to next cell sequence next time
-        waypoint_idx = 0;  % reset waypoint index
+        waypoint_idx = 1;  % reset waypoint index
         new_cell_seq = false;
         
         % Get boustrophedon waypoints (search path) for new cell sequence
@@ -71,10 +71,12 @@ for i = 2:numel(time_vector)    % start index at 2nd element
     
     % Get new waypoint from cell search path
     if new_waypoint == true
-        % Increment, reset and set flag
-        waypoint_idx = waypoint_idx + 1;
+        % Get new waypoint
         waypoint = search_path(waypoint_idx,:);
         controller.Waypoints = waypoint;
+        
+        % Update indices and flag
+        waypoint_idx = waypoint_idx + 1;
         new_waypoint = false;
     end
     
@@ -104,7 +106,7 @@ for i = 2:numel(time_vector)    % start index at 2nd element
     end
     
     % New event if end of waypoint is reached
-    dist_between = [pose(1,i),pose(2,i);search_path(waypoint_idx,1),search_path(waypoint_idx,2)];
+    dist_between = [pose(1,i),pose(2,i);search_path(waypoint_idx-1,1),search_path(waypoint_idx-1,2)];
     if pdist(dist_between,'euclidean') < waypoint_radius    % waypoint reached if within radius
         % Update
         disp('Waypoint reached.')
