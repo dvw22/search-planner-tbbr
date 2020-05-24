@@ -73,12 +73,20 @@ for i = 1:num_cell_seq
         travel_waypoints = findpath(planner,start_waypoint,end_waypoint);
         % The planner may not always find a path if the map is too complex.
         % This condition is to prevent the code from breaking.
-        if isempty(travel_waypoints) == 0
-            travel_waypoints(1,:) = [];  % Must clear source of travel to avoid duplicate
-            travel_waypoints(end,:) = [];  % Must clear destination of travel to avoid duplicate
-        else
+        while isempty(travel_waypoints) == 1
+            % Publish info
             display(['Path planning failed between cell sequence ',num2str(i),' and ',num2str(i+1),'.'])
-        end
+            display('Increasing nodes and connection distance')
+            
+            % Increase nodes
+            planner.NumNodes = planner.NumNodes * 2;
+            planner.ConnectionDistance = planner.ConnectionDistance * 2;
+            
+            % Calculate again
+            travel_waypoints = findpath(planner,start_waypoint,end_waypoint);
+        end    
+        travel_waypoints(1,:) = [];  % Must clear source of travel to avoid duplicate
+        travel_waypoints(end,:) = [];  % Must clear destination of travel to avoid duplicate
         map_waypoints = [map_waypoints; travel_waypoints];
         
         % Append travel indices
