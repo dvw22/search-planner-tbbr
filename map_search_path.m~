@@ -9,6 +9,8 @@ function [map_waypoints,segment_idx] = map_search_path(cell_order,decomposed_map
 map_waypoints = [];
 segment_idx = [];
 num_cell_seq = size(cell_order,1);
+original_num_nodes = planner.NumNodes;
+original_conn_dis = planner.ConnectionDistance;
 
 last_end_idx = 0;
 start_idx = 1;
@@ -39,6 +41,7 @@ for i = 1:num_cell_seq
             display(['Path planning failed between cell sequence ',num2str(i),' and ',num2str(i+1),'.'])
         end
         map_waypoints = [travel_waypoints; map_waypoints];
+        
         
         % Append travel indices
         num_waypoints = size(travel_waypoints,1);
@@ -84,11 +87,9 @@ for i = 1:num_cell_seq
             
             % Calculate again
             travel_waypoints = findpath(planner,start_waypoint,end_waypoint);
-        end
-        
+        end    
         travel_waypoints(1,:) = [];  % Must clear source of travel to avoid duplicate
         travel_waypoints(end,:) = [];  % Must clear destination of travel to avoid duplicate
-
         map_waypoints = [map_waypoints; travel_waypoints];
         
         % Append travel indices

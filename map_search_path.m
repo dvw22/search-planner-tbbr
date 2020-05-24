@@ -9,6 +9,8 @@ function [map_waypoints,segment_idx] = map_search_path(cell_order,decomposed_map
 map_waypoints = [];
 segment_idx = [];
 num_cell_seq = size(cell_order,1);
+original_num_nodes = planner.NumNodes;
+original_conn_dis = planner.ConnectionDistance;
 
 last_end_idx = 0;
 start_idx = 1;
