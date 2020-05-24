@@ -117,7 +117,7 @@ for i = 2:numel(time_vector)    % start index at 2nd element
     dist_between = [pose(1,i),pose(2,i);search_path(waypoint_idx-1,1),search_path(waypoint_idx-1,2)];
     if pdist(dist_between,'euclidean') < waypoint_radius    % waypoint reached if within radius
         % Publish info
-        disp('Waypoint reached.')
+        disp(['Waypoint ',num2str(waypoint_idx-1),'/',num2str(num_waypoints),' in cell sequence reached.'])
         
         % Cell sequence complete
         if waypoint_idx == num_waypoints
