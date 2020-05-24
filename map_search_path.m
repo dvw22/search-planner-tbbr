@@ -47,7 +47,7 @@ for i = 1:2:num_cell_seq
         last_end_idx = end_idx;  % store
         
         % Append next cell sequence waypoints
-        map_waypoints = [map_waypoints; cell_seq_waypoints];
+        map_waypoints = [map_waypoints; next_cell_seq_waypoints];
     
         % Append next cell sequence indices
         num_waypoints = size(next_cell_seq_waypoints,1);
