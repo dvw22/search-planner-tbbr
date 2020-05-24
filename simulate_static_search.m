@@ -1,4 +1,4 @@
-function [search_result] = simulate_static_search(init_pose, opi, decomposed_map, resolution, cell_order)
+function [search_result] = simulate_static_search(init_pose, opi, map_waypoints, segment_idx)
 %simulate_static_search Simulates a mobile robot statically executing a search path on the map.
 %   Detailed explanation goes here
 
@@ -40,44 +40,29 @@ pose = zeros(3,numel(time_vector));   % Initialise array, [x, y, theta] x time v
 pose(:,1) = init_pose;          % Add initial condition
 
 % Search waypoint indexing and flags and info
-cell_order_row = 1;
-new_cell_seq = true;
+segment = 1;
+new_segment = true;
 new_waypoint = true;
-num_cell_seq = size(cell_order,1);
+num_segments = size(segment_idx,1);
 
 %% Simulation Loop
 rate = rateControl(1/sample_time);
 for i = 2:numel(time_vector)    % start index at 2nd element
     %% Cell Sequence Updating
     % Get new search path for cell if starting a new cell
-    if new_cell_seq == true
-        % Get new cell sequence
-        cell_seq = cell_order(cell_order_row,:);    
-        cell_seq = cell_seq(:,any(cell_seq,1));  % remove zeros to truncate cell sequence
+    if new_segment == true
+        % Get new segment
+        seg_start_idx = segment_idx(segment,1);
+        seg_end_idx = segment_idx(segment,2);
+        search_path = map_waypoints(seg_start_idx:seg_end_idx,:);
         
         % Update indices and flag
-        cell_order_row = cell_order_row + 1;  % move to next cell sequence next time
+        segment = segment + 1;  % move to next cell sequence next time
         waypoint_idx = 1;  % reset waypoint index
-        new_cell_seq = false;
-        
-        % Get boustrophedon waypoints (search path) for new cell sequence
-        search_path = [];  % reset search path
-        cell_end_idx = [];  % reset cell counter
-        idx_sum = 0;
-        for col = 1:size(cell_seq,2)
-            % Update search path
-            cell_waypoints = cell_search_path(decomposed_map, cell_seq(col), resolution);
-            search_path = [search_path; cell_waypoints];  % uses appending method, can be indexed later
-            
-            % Update cell tracking indices matrix
-            num_cell_waypoints = size(cell_waypoints,1);
-            idx_sum = idx_sum + num_cell_waypoints;
-            cell_end_idx = [cell_end_idx, idx_sum];  % track cell end indices
-        end
+        new_segment = false;
         
         % Get search path size info
         num_waypoints = size(search_path,1);
-        cell_seq_count = 1;  % reset cell tracking index
     end
     
     %% Waypoint Updating
@@ -123,27 +108,21 @@ for i = 2:numel(time_vector)    % start index at 2nd element
     end
     
     %% Waypoint Checking
-    % Waypoint reached
+    % Check distance between robot and waypoint
     dist_between = [pose(1,i),pose(2,i);search_path(waypoint_idx-1,1),search_path(waypoint_idx-1,2)];
-    if pdist(dist_between,'euclidean') < waypoint_radius    % waypoint reached if within radius
+    
+    % Waypoint reached if robot within radius
+    if pdist(dist_between,'euclidean') < waypoint_radius    
         % Publish info
-        disp(['Waypoint ',num2str(waypoint_idx-1),'/',num2str(num_waypoints),' in cell sequence ',num2str(cell_order_row-1),'/',num2str(num_cell_seq),' reached.'])
-        if waypoint_idx-1 == cell_end_idx(cell_seq_count)
-            % Publish info
-            disp(['Cell ', num2str(cell_seq(cell_seq_count)),' complete.'])
-            
-            % Next cell index
-            cell_seq_count = cell_seq_count + 1;
-        end
-        
-        
+        disp(['Waypoint ',num2str(waypoint_idx-1),'/',num2str(num_waypoints),' in cell sequence ',num2str(segment-1),'/',num2str(num_segments),' reached.'])
+                
         % Cell sequence complete
         if waypoint_idx == num_waypoints
             % Publish info
             disp('End of cell sequence search path reached.')
             
             % Last cell sequence complete
-            if cell_order_row == num_cell_seq
+            if segment == num_segments
                 % Publish info
                 disp('End of complete search path reached. Ending search.');
             
@@ -153,7 +132,7 @@ for i = 2:numel(time_vector)    % start index at 2nd element
             else
                 % Next cell sequence and waypoint flags
                 new_waypoint = true;
-                new_cell_seq = true;
+                new_segment = true;
             end
             
         else
