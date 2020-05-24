@@ -47,7 +47,7 @@ viz.hasWaypoints = true;
 viz.mapName = 'map';
 viz(start_pose,map_waypoints)
 hold on
-plot(map_waypoints(:,1),map_waypoints(:,2),'-x')
+comet(map_waypoints(:,1),map_waypoints(:,2))
 hold off
 
 %% Simulate Search
