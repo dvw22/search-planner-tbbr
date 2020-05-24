@@ -47,6 +47,7 @@ new_waypoint = true;
 %% Simulation Loop
 rate = rateControl(1/sample_time);
 for i = 2:numel(time_vector)    % start index at 2nd element
+    %% Cell Sequence Updating
     % Get new search path for cell if starting a new cell
     if new_cell_seq == true
         % Get new cell sequence
@@ -69,6 +70,7 @@ for i = 2:numel(time_vector)    % start index at 2nd element
         num_waypoints = size(search_path,1);
     end
     
+    %% Waypoint Updating
     % Get new waypoint from cell search path
     if new_waypoint == true
         % Get new waypoint
@@ -80,6 +82,7 @@ for i = 2:numel(time_vector)    % start index at 2nd element
         new_waypoint = false;
     end
     
+    %% Simulation Updating
     % Run the Pure Pursuit controller and convert output to wheel speeds
     [ref_fwd_speed,ref_ang_speed] = controller(pose(:,i-1));          % Calculate forward and angular speeds
     [wL,wR] = inverseKinematics(mobile_robot,ref_fwd_speed,ref_ang_speed);        % Calculate individual wheel speeds 
@@ -97,41 +100,46 @@ for i = 2:numel(time_vector)    % start index at 2nd element
     viz(pose(:,i),controller.Waypoints,opi)
     waitfor(rate);
     
+    %% OPI Checking
     % Check if OPI is found
     detections = detector(pose(:,i),opi);
     if ~isempty(detections)
+        % Publish info
         disp('OPI detected. Ending search.');
+        
+        % Search succeeded
         search_result = true;
         break;
     end
     
-    % New event if end of waypoint is reached
+    %% Waypoint Checking
+    % Waypoint reached
     dist_between = [pose(1,i),pose(2,i);search_path(waypoint_idx-1,1),search_path(waypoint_idx-1,2)];
     if pdist(dist_between,'euclidean') < waypoint_radius    % waypoint reached if within radius
-        % Update
+        % Publish info
         disp('Waypoint reached.')
         
-        % Check if the last cell sequence waypoint has been reached
+        % Cell sequence complete
         if waypoint_idx == num_waypoints
-            % Update
+            % Publish info
             disp('End of cell sequence search path reached.')
             
-            % Check if the last cell sequence has been searched
+            % Last cell sequence complete
             if cell_order_row == size(cell_order,1)
-                % Update
+                % Publish info
                 disp('End of complete search path reached. Ending search.');
             
-                % End search
+                % Search failed
                 search_result = false;
                 break;
             else
-                % Reset and prepare
-                new_waypoint = true;  % start new waypoint
-                new_cell_seq = true;  % start new cell
+                % Next cell sequence and waypoint flags
+                new_waypoint = true;
+                new_cell_seq = true;
             end
             
         else
-            % Move to next waypoint
+            % Next waypoint flag
             new_waypoint = true;
         end
         

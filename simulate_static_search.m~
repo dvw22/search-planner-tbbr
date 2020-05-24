@@ -39,7 +39,7 @@ time_vector = 0:sample_time:end_time;
 pose = zeros(3,numel(time_vector));   % Initialise array, [x, y, theta] x time vector
 pose(:,1) = init_pose;          % Add initial condition
 
-% Search waypoint indexing
+% Search waypoint indexing and flags
 cell_order_row = 1;
 new_cell_seq = true;
 new_waypoint = true;
@@ -47,6 +47,7 @@ new_waypoint = true;
 %% Simulation Loop
 rate = rateControl(1/sample_time);
 for i = 2:numel(time_vector)    % start index at 2nd element
+    %% Cell Sequence Updating
     % Get new search path for cell if starting a new cell
     if new_cell_seq == true
         % Get new cell sequence
@@ -55,7 +56,7 @@ for i = 2:numel(time_vector)    % start index at 2nd element
         
         % Update indices and flag
         cell_order_row = cell_order_row + 1;  % move to next cell sequence next time
-        waypoint_idx = 0;  % reset waypoint index
+        waypoint_idx = 1;  % reset waypoint index
         new_cell_seq = false;
         
         % Get boustrophedon waypoints (search path) for new cell sequence
@@ -69,17 +70,19 @@ for i = 2:numel(time_vector)    % start index at 2nd element
         num_waypoints = size(search_path,1);
     end
     
+    %% Waypoint Updating
     % Get new waypoint from cell search path
     if new_waypoint == true
-        % Ge
-        
-        % Increment, reset and set flag
-        waypoint_idx = waypoint_idx + 1;
+        % Get new waypoint
         waypoint = search_path(waypoint_idx,:);
         controller.Waypoints = waypoint;
+        
+        % Update indices and flag
+        waypoint_idx = waypoint_idx + 1;
         new_waypoint = false;
     end
     
+    %% Simulation Updating
     % Run the Pure Pursuit controller and convert output to wheel speeds
     [ref_fwd_speed,ref_ang_speed] = controller(pose(:,i-1));          % Calculate forward and angular speeds
     [wL,wR] = inverseKinematics(mobile_robot,ref_fwd_speed,ref_ang_speed);        % Calculate individual wheel speeds 
@@ -97,6 +100,7 @@ for i = 2:numel(time_vector)    % start index at 2nd element
     viz(pose(:,i),controller.Waypoints,opi)
     waitfor(rate);
     
+    %% OPI Checking
     % Check if OPI is found
     detections = detector(pose(:,i),opi);
     if ~isempty(detections)
@@ -105,8 +109,9 @@ for i = 2:numel(time_vector)    % start index at 2nd element
         break;
     end
     
+    %% Waypoint Checking
     % New event if end of waypoint is reached
-    dist_between = [pose(1,i),pose(2,i);search_path(waypoint_idx,1),search_path(waypoint_idx,2)];
+    dist_between = [pose(1,i),pose(2,i);search_path(waypoint_idx-1,1),search_path(waypoint_idx-1,2)];
     if pdist(dist_between,'euclidean') < waypoint_radius    % waypoint reached if within radius
         % Update
         disp('Waypoint reached.')
