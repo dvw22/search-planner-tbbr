@@ -1,4 +1,4 @@
-function [search_result] = simulate_static_search(init_pose, opi, map_waypoints, segment_idx)
+function [search_result] = simulate_static_search(start_pose, opi, map_waypoints, segment_idx)
 %simulate_static_search Simulates a mobile robot statically executing a search path on the map.
 %   Detailed explanation goes here
 
@@ -37,7 +37,7 @@ time_vector = 0:sample_time:end_time;
 
 % Pose Array
 pose = zeros(3,numel(time_vector));   % Initialise array, [x, y, theta] x time vector
-pose(:,1) = init_pose;          % Add initial condition
+pose(:,1) = start_pose;          % Add initial condition
 
 % Search waypoint indexing and flags and info
 segment = 1;

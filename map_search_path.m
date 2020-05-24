@@ -1,4 +1,4 @@
-function [map_waypoints,segment_idx] = map_search_path(cell_order,decomposed_map,resolution,planner)
+function [map_waypoints,segment_idx] = map_search_path(cell_order,decomposed_map,resolution,planner, start_pos)
 % map_search_path Outputs a full waypoint list with a segment indices matrix
 % to access segmented regions during the waypoint planning process.
 %   The segments are either a cell sequence path or a shortest path between
@@ -27,6 +27,26 @@ for i = 1:num_cell_seq
         segment_idx = [segment_idx; [start_idx, end_idx]];
         start_idx = end_idx + 1;  % store
         last_end_idx = end_idx;  % store
+        
+        % Plan path to first waypoint
+        travel_waypoints = findpath(planner,start_pos,map_waypoints(1,:));
+        % The planner may not always find a path if the map is too complex.
+        % This condition is to prevent the code from breaking.
+        if isempty(travel_waypoints) == 0
+            travel_waypoints(1,:) = [];  % Must clear source
+            travel_waypoints(end,:) = [];  % Must clear destination of travel to avoid duplicate
+        else
+            display(['Path planning failed between cell sequence ',num2str(i),' and ',num2str(i+1),'.'])
+        end
+        map_waypoints = [travel_waypoints; map_waypoints];
+        
+        % Append travel indices
+        num_waypoints = size(travel_waypoints,1);
+        end_idx = last_end_idx + num_waypoints;
+        segment_idx = [segment_idx; [start_idx, end_idx]];
+        start_idx = end_idx + 1;  % store
+        last_end_idx = end_idx;  % store
+        
     % Just finished calculating a travel segment
     else
         % Append cell sequence waypoints
