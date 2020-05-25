@@ -20,7 +20,7 @@ for i = 1:num_cell_seq
     % Calculate waypoints before travel first time only
     if i == 1
         % Append cell sequence waypoints
-        [cell_seq_waypoints, num_cells] = cell_seq_search_path(cell_order(i,:),decomposed_map,resolution);
+        [cell_seq_waypoints, num_cells] = cell_seq_search_path(cell_order(i,:),decomposed_map,resolution,planner);
         map_waypoints = [map_waypoints; cell_seq_waypoints];
 
         % Append cell sequence indices
@@ -65,7 +65,7 @@ for i = 1:num_cell_seq
     % Append travel waypoints
     if i < num_cell_seq
         % Get next cell sequence waypoints
-        [next_cell_seq_waypoints, num_cells] = cell_seq_search_path(cell_order(i+1,:),decomposed_map,resolution);
+        [next_cell_seq_waypoints, num_cells] = cell_seq_search_path(cell_order(i+1,:),decomposed_map,resolution,planner);
         
         % Get start and end points for travel
         start_waypoint = cell_seq_waypoints(end,:);  % starting at end of last cell sequence
