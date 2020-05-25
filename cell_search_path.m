@@ -69,7 +69,7 @@ for i = 2:num_waypoints-1
     end
 end
 
-% end with last ceiling/floor
+% End with last ceiling/floor
 if add_ceilings == true
     cell_indices(num_waypoints,:) = ceiling_idx(num_ceiling,:);
 elseif add_ceilings == false
@@ -77,14 +77,44 @@ elseif add_ceilings == false
 end
 
 %% Post processing to insert waypoint paths between edges
-% insertion_offset = 0;  % initialise offset due to path insertions
-% for i = 1:size(insertion_idx,1)
+insertion_offset = 0;  % initialise offset due to path insertions
+for i = 1:size(insertion_indices,1)
+    % Get start and end points for travel 
+    insertion_idx = insertion_indices(i);
+	start_point = cell_indices(insertion_idx - 1 + insertion_offset,:);
+	end_point = cell_indices(insertion_idx + insertion_offset,:);
+    
+    % Plan path between points
+    inserted_path = findpath(planner,start_point,end_point);
+    while isempty(inserted_path) == 1
+        % Publish info
+        disp('Path planning failed between cell waypoints.')
+		disp('Increasing nodes and connection distance.')
+        
+        % Increase nodes and connection distances
+        planner.NumNodes = planner.NumNodes * 2;
+        planner.ConnectionDistance = planner.ConnectionDistance * 2;
+        
+        % Calculate again
+        inserted_path = findpath(planner,start_point,end_point);
+    end
+    
+    % Insert into cell_indices
+	before_insertion = cell_indices(1:insertion_idx-1,:);
+	after_insertion = cell_indices(insertion_idx:end,:);
+	cell_indices = [before_insertion; inserted_path; after_insertion];
 
+    % Track length change due to insertion for next insertion
+	insertion_offset = insertion_offset + size(inserted_path,1) - 2;
+end
 
-% update num_waypoints
+% Update number of waypoints due to insertions
+num_waypoints = size(cell_indices,1);
 
 
 %% Convert from matrix indices [row, col] to map waypoints [x, y]
+cell_waypoints = cell_indices;  % [x1,y1; x2,y2; ...]
+cell_waypoints(:) = 0;
 
 % Rows are y reference, columns are x reference (swap)
 cell_waypoints(:,1) = cell_indices(:,2);

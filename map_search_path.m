@@ -78,9 +78,9 @@ for i = 1:num_cell_seq
         while isempty(travel_waypoints) == 1
             % Publish info
             display(['Path planning failed between cell sequence ',num2str(i),' and ',num2str(i+1),'.'])
-            display('Increasing nodes and connection distance')
+            display('Increasing nodes and connection distance.')
             
-            % Increase nodes
+            % Increase nodes and connection distances
             planner.NumNodes = planner.NumNodes * 2;
             planner.ConnectionDistance = planner.ConnectionDistance * 2;
             
