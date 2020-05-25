@@ -119,8 +119,8 @@ for i = 1:size(insertion_indices,1)
     inserted_path(end,:) = [];  % Must clear destination of travel to avoid duplicate
     
     % Insert into cell_indices
-	before_insertion = cell_waypoints(1:insertion_idx-1,:);
-	after_insertion = cell_waypoints(insertion_idx:end,:);
+	before_insertion = cell_waypoints(1:(insertion_idx+insertion_offset)-1,:);
+	after_insertion = cell_waypoints(insertion_idx+insertion_offset:end,:);
 	cell_waypoints = [before_insertion; inserted_path; after_insertion];
 
     % Track length change due to insertion for next insertion
