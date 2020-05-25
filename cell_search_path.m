@@ -8,7 +8,6 @@ num_ceiling = size(ceiling_idx,1);
 num_waypoints = num_ceiling*2;
 
 cell_indices = zeros(num_waypoints,2);  % [row1,col1; row2,col2]
-cell_waypoints = cell_indices;  % [x1,y1; x2,y2; ...]
 
 %% Populate with matrix indices
 
@@ -76,42 +75,6 @@ elseif add_ceilings == false
     cell_indices(num_waypoints,:) = floor_idx(num_ceiling,:);
 end
 
-%% Post processing to insert waypoint paths between edges
-insertion_offset = 0;  % initialise offset due to path insertions
-for i = 1:size(insertion_indices,1)
-    % Get start and end points for travel 
-    insertion_idx = insertion_indices(i);
-	start_point = cell_indices(insertion_idx - 1 + insertion_offset,:);
-	end_point = cell_indices(insertion_idx + insertion_offset,:);
-    
-    % Plan path between points
-    inserted_path = findpath(planner,start_point,end_point);
-    while isempty(inserted_path) == 1
-        % Publish info
-        disp('Path planning failed between cell waypoints.')
-		disp('Increasing nodes and connection distance.')
-        
-        % Increase nodes and connection distances
-        planner.NumNodes = planner.NumNodes * 2;
-        planner.ConnectionDistance = planner.ConnectionDistance * 2;
-        
-        % Calculate again
-        inserted_path = findpath(planner,start_point,end_point);
-    end
-    
-    % Insert into cell_indices
-	before_insertion = cell_indices(1:insertion_idx-1,:);
-	after_insertion = cell_indices(insertion_idx:end,:);
-	cell_indices = [before_insertion; inserted_path; after_insertion];
-
-    % Track length change due to insertion for next insertion
-	insertion_offset = insertion_offset + size(inserted_path,1) - 2;
-end
-
-% Update number of waypoints due to insertions
-num_waypoints = size(cell_indices,1);
-
-
 %% Convert from matrix indices [row, col] to map waypoints [x, y]
 cell_waypoints = cell_indices;  % [x1,y1; x2,y2; ...]
 cell_waypoints(:) = 0;
@@ -129,6 +92,43 @@ cell_waypoints = cell_waypoints - 0.5;
 % Perform scaling for resolution
 cell_waypoints = cell_waypoints/resolution;
 
+
+%% Post processing to insert waypoint paths between edges
+insertion_offset = 0;  % initialise offset due to path insertions
+for i = 1:size(insertion_indices,1)
+    % Get start and end points for travel 
+    insertion_idx = insertion_indices(i);
+	start_point = cell_waypoints(insertion_idx - 1 + insertion_offset,:);
+	end_point = cell_waypoints(insertion_idx + insertion_offset,:);
+    
+    % Plan path between points
+    inserted_path = findpath(planner,start_point,end_point);
+    while isempty(inserted_path) == 1
+        % Publish info
+        disp('Path planning failed between cell waypoints.')
+		disp('Increasing nodes and connection distance.')
+        
+        % Increase nodes and connection distances
+        planner.NumNodes = planner.NumNodes * 2;
+        planner.ConnectionDistance = planner.ConnectionDistance * 2;
+        
+        % Calculate again
+        inserted_path = findpath(planner,start_point,end_point);
+    end
+    inserted_path(1,:) = [];  % Must clear source of travel to avoid duplicate
+    inserted_path(end,:) = [];  % Must clear destination of travel to avoid duplicate
+    
+    % Insert into cell_indices
+	before_insertion = cell_waypoints(1:insertion_idx-1,:);
+	after_insertion = cell_waypoints(insertion_idx:end,:);
+	cell_waypoints = [before_insertion; inserted_path; after_insertion];
+
+    % Track length change due to insertion for next insertion
+	insertion_offset = insertion_offset + size(inserted_path,1);
+end
+
+% Update number of waypoints due to insertions
+num_waypoints = size(cell_waypoints,1);
 
 end
 
