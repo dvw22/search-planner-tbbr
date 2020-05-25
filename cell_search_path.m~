@@ -23,7 +23,6 @@ j = 1;  % different rate counter
 insertion_indices = [];
 
 for i = 2:num_waypoints-1
-    % Adding ceiling points
     if add_ceilings == true
         % Add a ceiling point
         cell_indices(i,:) = ceiling_idx(j,:);
@@ -31,33 +30,11 @@ for i = 2:num_waypoints-1
         % Get next row of ceiling_idx (even)
         if mod(i,2) == 0
             j = j+1;
-            
         % Reset index for floor_idx counting every other time (odd)
         else
-            add_ceilings = false;
-            j = j-1;
-        end 
-    % Adding floor points
-    else
-        % Add a floor point
-        cell_indices(i,:) = floor_idx(j+1,:);
-        
-        % Check if both pairs of ceiling and floor are added
-        if mod(i-1,4) == 0
-            j = j+2;
-        end
-        
-        % Get next row of floor_idx (even)
-        if mod(i,2) == 0
-            j = j+1;
-            
-        % Reset index for ceiling_idx counting every other time (odd)
-        else
-            add_ceilings = true;
+            a
             j = j-1;
         end
-    end
-end
 
 % for i = 2:2:num_waypoints-2
 %     if add_ceilings == true
