@@ -30,10 +30,15 @@ for i = 2:num_waypoints-1
         
         % Get next row of ceiling_idx (even)
         if mod(i,2) == 0
-            j = j+1;
-            
+            j = j+1; 
         % Reset index for floor_idx counting every other time (odd)
         else
+            % Check pair for edges
+            if cell_indices(i,1) ~= cell_indices(i-1,1)
+                insertion_indices = [insertion_indices; i];  % store insertion index
+            end
+            
+            % Reset for next pair
             add_ceilings = false;
             j = j-1;
         end 
@@ -50,46 +55,19 @@ for i = 2:num_waypoints-1
         % Get next row of floor_idx (even)
         if mod(i,2) == 0
             j = j+1;
-            
         % Reset index for ceiling_idx counting every other time (odd)
         else
+            % Check pair for edges
+            if cell_indices(i,1) ~= cell_indices(i-1,1)
+                insertion_indices = [insertion_indices; i];  % store insertion index
+            end
+            
+            % Reset for next pair
             add_ceilings = true;
             j = j-1;
         end
     end
 end
-
-% for i = 2:2:num_waypoints-2
-%     if add_ceilings == true
-%         % Add two next ceiling points
-%         cell_indices(i,:) = ceiling_idx(j,:);
-%         cell_indices(i+1,:) = ceiling_idx(j+1,:);
-%         
-%         % Check if edge is reached
-%         if ceiling_idx(k+1,:) ~= ceiling_idx(k,:)
-%             insertion_indices = [insertion_indices; i+1];  % store insertion index
-%         end
-%         
-%         % Set flag to check floor
-%         add_ceilings = false;
-%         
-%     elseif add_ceilings == false
-%         % Add two next floor points
-%         cell_indices(i,:) = floor_idx(j+1,:);
-%         cell_indices(i+1,:) = floor_idx(j+2,:);
-%         
-%         % Check if edge is reached
-%         if floor_idx(k+1,:) ~= floor_idx(k,:)
-%             insertion_indices = [insertion_indices; i+1];  % store insertion index
-%         end
-%         
-%         % Set flag to check ceiling and increment different rate counters
-%         add_ceilings = true;
-%         j = j+2;
-%         k = k+1;
-%     end 
-%     
-% end
 
 % end with last ceiling/floor
 if add_ceilings == true
