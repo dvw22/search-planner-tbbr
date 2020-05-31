@@ -33,7 +33,7 @@ classdef SearchPlanner
             obj.PathPlanner.ConnectionDistance = 5;
         end
         
-        function [map_waypoints,segment_idx] = map_search_path(obj,init_pos)
+        function [complete_waypoints,segment_idx] = complete_search_path(obj,init_pos)
             % map_search_path Outputs a full waypoint list with a segment indices matrix
             % to access segmented regions during the waypoint planning process.
             %   The segments are either a cell sequence path or a shortest path between
@@ -41,7 +41,7 @@ classdef SearchPlanner
 
             %% Waypoint Generation
             % Initialise
-            map_waypoints = [];
+            complete_waypoints = [];
             segment_idx = [];
             num_cell_seq = size(obj.cell_order,1);
             original_num_nodes = obj.PathPlanner.NumNodes;
@@ -55,8 +55,8 @@ classdef SearchPlanner
                 % Calculate waypoints before travel first time only
                 if i == 1
                     % Append cell sequence waypoints
-                    [cell_seq_waypoints, num_cells] = cell_seq_search_path(obj.cell_order(i,:),obj.decomposed_matrix,obj.map_resolution,obj.PathPlanner);
-                    map_waypoints = [map_waypoints; cell_seq_waypoints];
+                    [cell_seq_waypoints, num_cells] = obj.cell_seq_search_path(obj.cell_order(i,:));
+                    complete_waypoints = [complete_waypoints; cell_seq_waypoints];
 
                     % Append cell sequence indices
                     num_waypoints = size(cell_seq_waypoints,1);
@@ -66,7 +66,7 @@ classdef SearchPlanner
                     last_end_idx = end_idx;  % store
 
                     % Plan path to first waypoint
-                    travel_waypoints = findpath(obj.PathPlanner,init_pos,map_waypoints(1,:));
+                    travel_waypoints = findpath(obj.PathPlanner,init_pos,complete_waypoints(1,:));
                     % The planner may not always find a path if the map is too complex.
                     % This condition is to prevent the code from breaking.
                     if isempty(travel_waypoints) == 0
@@ -75,7 +75,7 @@ classdef SearchPlanner
                     else
                         display(['Path planning failed between cell sequence ',num2str(i),' and ',num2str(i+1),'.'])
                     end
-                    map_waypoints = [travel_waypoints; map_waypoints];
+                    complete_waypoints = [travel_waypoints; complete_waypoints];
 
                     % Append travel indices
                     num_waypoints = size(travel_waypoints,1);
@@ -87,7 +87,7 @@ classdef SearchPlanner
                 % Just finished calculating a travel segment
                 else
                     % Append cell sequence waypoints
-                    map_waypoints = [map_waypoints; cell_seq_waypoints];
+                    complete_waypoints = [complete_waypoints; cell_seq_waypoints];
 
                     % Append cell sequence indices
                     num_waypoints = size(cell_seq_waypoints,1);
@@ -100,7 +100,7 @@ classdef SearchPlanner
                 % Append travel waypoints
                 if i < num_cell_seq
                     % Get next cell sequence waypoints
-                    [next_cell_seq_waypoints, num_cells] = cell_seq_search_path(obj.cell_order(i+1,:),obj.decomposed_matrix,obj.map_resolution,obj.PathPlanner);
+                    [next_cell_seq_waypoints, num_cells] = obj.cell_seq_search_path(obj.cell_order(i+1,:));
 
                     % Get start and end points for travel
                     start_waypoint = cell_seq_waypoints(end,:);  % starting at end of last cell sequence
@@ -124,7 +124,7 @@ classdef SearchPlanner
                     end    
                     travel_waypoints(1,:) = [];  % Must clear source of travel to avoid duplicate
                     travel_waypoints(end,:) = [];  % Must clear destination of travel to avoid duplicate
-                    map_waypoints = [map_waypoints; travel_waypoints];
+                    complete_waypoints = [complete_waypoints; travel_waypoints];
 
                     % Append travel indices
                     num_waypoints = size(travel_waypoints,1);
@@ -138,7 +138,9 @@ classdef SearchPlanner
                 end
             end
         end
-
+    end
+       
+    methods (Access = private)
         function [decomposed_matrix, reeb_graph, cell_counter] = btd_cell_decomposition(obj,bi_occ_matrix)
             %btd_cell_decomposition Uses boustrophedon cell decomposition to output a
             %region divided occupancy map
@@ -394,6 +396,162 @@ classdef SearchPlanner
                     break
                 end
             end
+        end
+        
+        function [cell_seq_waypoints, num_cells] = cell_seq_search_path(obj,cell_seq)
+            % cell_seq_search_path Outputs waypoints for a set of cells in an optimised order
+            %   Gets a row in from a cell order plan matrix. Slices off zeroed
+            %   elements. Inputs each element as a cell number to cell_search_path.
+            %   Appends the result to a full cell sequence waypoint matrix.
+
+            %% Preparation
+            % Slice off zeros
+            cell_seq = cell_seq(:,any(cell_seq,1));
+
+            %% Initialise
+            % Initialise
+            cell_seq_waypoints = [];  % reset search path
+            num_cells = size(cell_seq,2);
+
+            %% Waypoint Generation
+            % Get waypoints for each cell and append
+            for i = 1:num_cells
+                [cell_waypoints, num_waypoints] = obj.cell_search_path(cell_seq(i));
+                cell_seq_waypoints = [cell_seq_waypoints; cell_waypoints];
+            end
+        end     
+
+        function [cell_waypoints, num_waypoints] = cell_search_path(obj,cell)
+            % cell_search path Generates a search path within a cell
+            %   Detailed explanation goes here
+
+            [ceiling_idx, floor_idx] = ceil_floor_cell(obj.decomposed_matrix, cell);  
+
+            num_ceiling = size(ceiling_idx,1);
+            num_waypoints = num_ceiling*2;
+
+            cell_indices = zeros(num_waypoints,2);  % [row1,col1; row2,col2]
+
+            %% Populate with matrix indices
+
+            % Start at bottom left
+            cell_indices(1,:) = floor_idx(1,:);
+
+            % Initialise
+            add_ceilings = true;
+            j = 1;  % different rate counter
+
+            % For waypoint planning in between edges
+            insertion_indices = [];
+
+            for i = 2:num_waypoints-1
+                % Adding ceiling points
+                if add_ceilings == true
+                    % Add a ceiling point
+                    cell_indices(i,:) = ceiling_idx(j,:);
+
+                    % Get next row of ceiling_idx (even)
+                    if mod(i,2) == 0
+                        j = j+1; 
+                    % Reset index for floor_idx counting every other time (odd)
+                    else
+                        % Check pair for edges
+                        if cell_indices(i,1) ~= cell_indices(i-1,1)
+                            insertion_indices = [insertion_indices; i];  % store insertion index
+                        end
+
+                        % Reset for next pair
+                        add_ceilings = false;
+                        j = j-1;
+                    end 
+                % Adding floor points
+                else
+                    % Add a floor point
+                    cell_indices(i,:) = floor_idx(j+1,:);
+
+                    % Check if both pairs of ceiling and floor are added
+                    if mod(i-1,4) == 0
+                        j = j+2;
+                    end
+
+                    % Get next row of floor_idx (even)
+                    if mod(i,2) == 0
+                        j = j+1;
+                    % Reset index for ceiling_idx counting every other time (odd)
+                    else
+                        % Check pair for edges
+                        if cell_indices(i,1) ~= cell_indices(i-1,1)
+                            insertion_indices = [insertion_indices; i];  % store insertion index
+                        end
+
+                        % Reset for next pair
+                        add_ceilings = true;
+                        j = j-1;
+                    end
+                end
+            end
+
+            % End with last ceiling/floor
+            if add_ceilings == true
+                cell_indices(num_waypoints,:) = ceiling_idx(num_ceiling,:);
+            elseif add_ceilings == false
+                cell_indices(num_waypoints,:) = floor_idx(num_ceiling,:);
+            end
+
+            %% Convert from matrix indices [row, col] to map waypoints [x, y]
+            cell_waypoints = cell_indices;  % [x1,y1; x2,y2; ...]
+            cell_waypoints(:) = 0;
+
+            % Rows are y reference, columns are x reference (swap)
+            cell_waypoints(:,1) = cell_indices(:,2);
+            cell_waypoints(:,2) = cell_indices(:,1);
+
+            % Flip y points
+            cell_waypoints(:,2) = (size(obj.decomposed_matrix,1)+1) - cell_waypoints(:,2);
+
+            % Shift waypoints to centres of grid units
+            cell_waypoints = cell_waypoints - 0.5;
+
+            % Perform scaling for resolution
+            cell_waypoints = cell_waypoints/obj.map_resolution;
+
+
+            %% Post processing to insert waypoint paths between edges
+            insertion_offset = 0;  % initialise offset due to path insertions
+            for i = 1:size(insertion_indices,1)
+                % Get start and end points for travel 
+                insertion_idx = insertion_indices(i);
+                start_point = cell_waypoints(insertion_idx - 1 + insertion_offset,:);
+                end_point = cell_waypoints(insertion_idx + insertion_offset,:);
+
+                % Plan path between points
+                inserted_path = findpath(obj.PathPlanner,start_point,end_point);
+                while isempty(inserted_path) == 1
+                    % Publish info
+                    disp('Path planning failed between cell waypoints.')
+                    disp('Increasing nodes and connection distance.')
+
+                    % Increase nodes and connection distances
+                    obj.PathPlanner.NumNodes = obj.PathPlanner.NumNodes * 2;
+                    obj.PathPlanner.ConnectionDistance = obj.PathPlanner.ConnectionDistance * 2;
+
+                    % Calculate again
+                    inserted_path = findpath(obj.PathPlanner,start_point,end_point);
+                end
+                inserted_path(1,:) = [];  % Must clear source of travel to avoid duplicate
+                inserted_path(end,:) = [];  % Must clear destination of travel to avoid duplicate
+
+                % Insert into cell_indices
+                before_insertion = cell_waypoints(1:(insertion_idx+insertion_offset)-1,:);
+                after_insertion = cell_waypoints(insertion_idx+insertion_offset:end,:);
+                cell_waypoints = [before_insertion; inserted_path; after_insertion];
+
+                % Track length change due to insertion for next insertion
+                insertion_offset = insertion_offset + size(inserted_path,1);
+            end
+
+            % Update number of waypoints due to insertions
+            num_waypoints = size(cell_waypoints,1);
         end
 
     end
