@@ -10,11 +10,10 @@ classdef SearchTestSuite < handle
         search_coverage
         search_duration
         num_collisions
-        search_matrix
     end
     
     properties (Access = private)
-%         search_matrix
+        search_matrix
     end
     
     methods
@@ -51,10 +50,24 @@ classdef SearchTestSuite < handle
             %unoccupied_area Calculates the total free area in the map
             bi_occ_matrix = occupancyMatrix(obj.bi_occ_map);
             
-            num_occupied_cells = sum(sum(bi_occ_matrix));
+            num_occupied_units = sum(sum(bi_occ_matrix));
 
-            num_unoccupied_cells = numel(bi_occ_matrix) - num_occupied_cells;  % calculate number of unsearched cells
-            unoccupied_area = (1/obj.bi_occ_map.Resolution)^2 * num_unoccupied_cells;  % convert to area
+            num_unoccupied_units = numel(bi_occ_matrix) - num_occupied_units;  % calculate number of unsearched cells
+            unoccupied_area = (1/obj.bi_occ_map.Resolution)^2 * num_unoccupied_units;  % convert to area
+        end
+        
+        function [] = update_searched_area(obj)
+            %update_searched_area Calculates the total searched area in the map 
+            % Get logical mask of search grid units
+            searched = obj.search_matrix==2;
+            
+            num_searched_units = sum(sum(searched));
+
+            obj.searched_area = (1/obj.bi_occ_map.Resolution)^2 * num_searched_units;  % convert to area
+        end
+        
+        function [] = update_search_coverage(obj)
+            %unoccupied_area Calculates the current search coverage
         end
         
         function [] = update_search_matrix(obj,pose)
@@ -124,6 +137,8 @@ classdef SearchTestSuite < handle
             show(search_map)
         end
 
+        
+        
     end
 end
 
