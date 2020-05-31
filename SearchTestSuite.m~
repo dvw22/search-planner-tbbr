@@ -1,7 +1,7 @@
-classdef SearchTestSuite
+classdef SearchTestSuite < handle
     %SearchTestSuite Measures and collects relevant search metrics during
     %simulation.
-    %   Detailed explanation goes here
+    %   Handle because the methods need to update the object's properties
     
     properties
         bi_occ_map
@@ -13,13 +13,17 @@ classdef SearchTestSuite
     end
     
     properties (Access = private)
-        search_matrix
-        
+%         search_matrix
     end
     
     methods
-        function obj = SearchTestSuite(bi_occ_map)
+        function obj = SearchTestSuite(occ_map)
             %SearchTestSuite Construct an instance of this class
+            % Convert to binary occupancy map
+            occ_matrix = occupancyMatrix(occ_map);
+            bi_occ_matrix = round(occ_matrix);  % convert to binary matrix ASSUMPTION
+            bi_occ_map = binaryOccupancyMap(bi_occ_matrix,occ_map.Resolution);
+            
             % Store binary occupancy map
             obj.bi_occ_map = bi_occ_map;
             
@@ -37,6 +41,9 @@ classdef SearchTestSuite
             
             % Initialise collisions
             obj.num_collisions = 0;
+            
+            % Initialise search matrix
+            obj.search_matrix = double(occupancyMatrix(bi_occ_map));
         end
         
         function [unoccupied_area] = calc_unoccupied_area(obj)
@@ -46,10 +53,10 @@ classdef SearchTestSuite
             num_occupied_cells = sum(sum(bi_occ_matrix));
 
             num_unoccupied_cells = numel(bi_occ_matrix) - num_occupied_cells;  % calculate number of unsearched cells
-            unoccupied_area = (1/occ_map.Resolution)^2 * num_unoccupied_cells;  % convert to area
+            unoccupied_area = (1/obj.bi_occ_map.Resolution)^2 * num_unoccupied_cells;  % convert to area
         end
         
-        function [] = update_search_matrix(obj,pose)
+        function [obj] = update_search_matrix(obj,pose)
             % update_search_matrix Adds the grid units currently in the object 
             % detector's FoV and DoF to the search matrix
             %   Within the search matrix:
@@ -86,7 +93,7 @@ classdef SearchTestSuite
 
             % Find which grid units the rays intersect and update search matrix
             for i = 1:size(ranges,1)
-                [end_unit, grid_units] = raycast(bi_occ_map,pose,ranges(i),scan_angles(i));
+                [end_unit, grid_units] = raycast(obj.bi_occ_map,pose,ranges(i),scan_angles(i));
 
                 % Convert midpoints to linear indices
                 row_idx = [grid_units(:,1); 0];
@@ -94,7 +101,7 @@ classdef SearchTestSuite
                 % Add endpoint too
                 row_idx(end) = end_unit(1,1);
                 col_idx(end) = end_unit(1,2);
-                linear_idx = sub2ind(bi_occ_map.GridSize,row_idx,col_idx);
+                linear_idx = sub2ind(obj.bi_occ_map.GridSize,row_idx,col_idx);
 
                 % Replace raycast indices with 2 to indicate searched
                 obj.search_matrix(linear_idx) = 2;
@@ -102,12 +109,37 @@ classdef SearchTestSuite
 
             %% Post-processing: Fix Flooding into Occupied Spaces by Repopulating
             % Get logical mask of occupancy map
-            bi_occ_matrix = occupancyMatrix(bi_occ_map);
+            bi_occ_matrix = occupancyMatrix(obj.bi_occ_map);
             % Replace with 1 for obstacles
             obj.search_matrix(bi_occ_matrix) = 1;
-
         end
 
+        function [] = view_searched_map(obj)
+            % update_search_matrix Adds the grid units currently in the object 
+            % detector's FoV and DoF to the search matrix
+            % Placeholder pose
+            pose = [2;2;0];
+            
+            % Homemade
+            rays = 10;
+            scan_angles = linspace(-pi/6,pi/6,rays);
+            max_range = 5;
+            ranges = zeros(size(scan_angles,2),1);
+            % Object
+            area_measure = LidarSensor;
+            area_measure.sensorOffset = [0,0];
+            area_measure.scanAngles = scan_angles;
+            area_measure.maxRange = max_range;
+            
+            % Create visualizer
+            Viz = Visualizer2D;
+            attachLidarSensor(Viz,area_measure);
+            
+            % Visualise
+            search_map = binaryOccupancyMap(obj.search_matrix,obj.bi_occ_map.Resolution);
+            Viz.mapName = 'search_map';
+            Viz(pose,ranges)
+        end
 
     end
 end
