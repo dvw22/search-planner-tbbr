@@ -57,7 +57,7 @@ classdef SearchTestSuite < handle
             unoccupied_area = (1/obj.bi_occ_map.Resolution)^2 * num_unoccupied_cells;  % convert to area
         end
         
-        function [obj] = update_search_matrix(obj,pose)
+        function [] = update_search_matrix(obj,pose)
             % update_search_matrix Adds the grid units currently in the object 
             % detector's FoV and DoF to the search matrix
             %   Within the search matrix:
@@ -138,8 +138,7 @@ classdef SearchTestSuite < handle
             
             % Visualise
             search_map = binaryOccupancyMap(obj.search_matrix,obj.bi_occ_map.Resolution);
-            Viz.mapName = 'search_map';
-            Viz(pose,ranges)
+            show(search_map)
         end
 
     end
