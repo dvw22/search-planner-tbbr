@@ -23,13 +23,7 @@ Search_planner = SearchPlanner(map);
 
 %% Plot Path
 % Simulation Visualiser
-viz = Visualizer2D;
-viz.hasWaypoints = true;
-viz.mapName = 'map';
-viz(Search_robot.pose,complete_waypoints)
-hold on
-comet(complete_waypoints(:,1),complete_waypoints(:,2))
-hold off
+Search_planner.plot_path(complete_waypoints)
 
 %% Simulate Search
 result = simulate_static_search(Search_robot,opi,complete_waypoints,segment_idx);

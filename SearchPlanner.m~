@@ -9,7 +9,6 @@ classdef SearchPlanner
         num_cells
         cell_order
         PathPlanner
-        Viz
     end
     
     methods
@@ -32,11 +31,6 @@ classdef SearchPlanner
             obj.PathPlanner = mobileRobotPRM(bi_occ_map);
             obj.PathPlanner.NumNodes = 75;
             obj.PathPlanner.ConnectionDistance = 5;
-            
-            % Initialise visualizer
-            obj.Viz = Visualizer2D;
-            obj.Viz.hasWaypoints = true;
-            obj.Viz.mapName = 'map';
         end
         
         function [complete_waypoints,segment_idx] = complete_search_path(obj,init_pos)
@@ -145,15 +139,14 @@ classdef SearchPlanner
             end
         end
         
-        function [] = plot_path(obj,complete_waypoints)
-            %plot_path Plots the path as waypoints on the occupancy map
-            % Placeholder pose to use visualizer
-            pose = [0,0,0]
-
-            % Display visualisation
-            obj.Viz(pose,complete_waypoints)
+        function
+            %% Plot Path
+            % Simulation Visualiser
+            viz = Visualizer2D;
+            viz.hasWaypoints = true;
+            viz.mapName = 'map';
+            viz(Search_robot.pose,complete_waypoints)
             hold on
-            % Plot waypoint connection animation
             comet(complete_waypoints(:,1),complete_waypoints(:,2))
             hold off
         end
