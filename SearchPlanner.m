@@ -148,7 +148,7 @@ classdef SearchPlanner
         function [] = plot_path(obj,complete_waypoints)
             %plot_path Plots the path as waypoints on the occupancy map
             % Placeholder pose to use visualizer
-            pose = [0,0,0]
+            pose = [0,0,0];
 
             % Display visualisation
             obj.Viz(pose,complete_waypoints)
