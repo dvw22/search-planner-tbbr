@@ -1,9 +1,8 @@
-function [search_result] = simulate_static_search(Search_robot, start_pose, opi, map_waypoints, segment_idx)
+function [search_result] = simulate_static_search(Search_robot,opi,map_waypoints,segment_idx)
 %simulate_static_search Simulates a mobile robot statically executing a search path on the map.
 %   Detailed explanation goes here
 
 %% Environment Setup
-
 % Simulation Visualiser
 Viz = Visualizer2D;
 Viz.hasWaypoints = true;
@@ -12,22 +11,20 @@ attachObjectDetector(Viz,Search_robot.Detector);
 Viz.objectColors = [1 0 0;0 1 0;0 0 1];
 Viz.objectMarkers = 'so^';
 
-%% Vehicle Setup
-
-waypoint_radius = 0.5;
+% Waypoint Reached Radius
+waypoint_radius = 0.5;  % [m]
 
 %% Simulation Loop Setup
-
 % Time Array
-sample_time = 0.1;              % [s]
-end_time = 600;                  % Arbitrarily set to 10 minutes [s]
+sample_time = 0.1;  % [s]
+end_time = 1800;  % Arbitrarily set to 30 minutes [s]
 time_vector = 0:sample_time:end_time;
 
 % Pose Array
-pose = zeros(3,numel(time_vector));   % Initialise array, [x, y, theta] x time vector
-pose(:,1) = start_pose;          % Add initial condition
+pose = zeros(3,numel(time_vector));  % Initialise array, [x, y, theta] * time vector
+pose(:,1) = Search_robot.pose;  % Add initial condition
 
-% Search waypoint indexing and flags and info
+% Search Waypoint Indexing and Flags and Info
 segment = 1;
 new_segment = true;
 new_waypoint = true;
@@ -35,7 +32,7 @@ num_segments = size(segment_idx,1);
 
 %% Simulation Loop
 rate = rateControl(1/sample_time);
-for i = 2:numel(time_vector)    % start index at 2nd element
+for i = 2:numel(time_vector)  % start index at 2nd element
     %% Segment Updating
     % Get new search path if starting a new segment
     if new_segment == true
@@ -67,17 +64,18 @@ for i = 2:numel(time_vector)    % start index at 2nd element
     
     %% Simulation Updating
     % Run the Pure Pursuit controller and convert output to wheel speeds
-    [ref_fwd_speed,ref_ang_speed] = Search_robot.Controller(pose(:,i-1));          % Calculate forward and angular speeds
-    [wL,wR] = inverseKinematics(Search_robot.MobileRobot,ref_fwd_speed,ref_ang_speed);        % Calculate individual wheel speeds 
+    [ref_fwd_speed,ref_ang_speed] = Search_robot.Controller(pose(:,i-1));  % Calculate forward and angular speeds
+    [wL,wR] = inverseKinematics(Search_robot.MobileRobot,ref_fwd_speed,ref_ang_speed);  % Calculate individual wheel speeds 
     
     % Compute the velocities
     [fwd_speed,ang_speed] = forwardKinematics(Search_robot.MobileRobot,wL,wR);
-    body_velocity = [fwd_speed;0;ang_speed]; % Body velocities [vx;vy;w]
+    body_velocity = [fwd_speed;0;ang_speed];  % Body velocities [vx;vy;w]
     world_velocity = bodyToWorld(body_velocity,pose(:,i-1));  % Convert from body coordinates to world coordinates
     
     % Perform forward discrete integration step
-    world_distance = world_velocity*sample_time;    % Calculate distance moved
-    pose(:,i) = pose(:,i-1) + world_distance;    % Calculate new pose
+    world_distance = world_velocity*sample_time;  % Calculate distance moved
+    pose(:,i) = pose(:,i-1) + world_distance;  % Calculate new pose
+    Search_robot.pose = pose(:,i);  % Update search robot object
     
     % Update visualization
     Viz(pose(:,i),Search_robot.Controller.Waypoints,opi)
@@ -131,7 +129,6 @@ for i = 2:numel(time_vector)    % start index at 2nd element
     end 
     
 end
-
 
 end
 
