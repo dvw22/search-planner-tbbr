@@ -49,11 +49,21 @@ for i = 1:size(ranges,1)
     search_matrix(linear_idx) = 2;
 end
 
-%% Post-processing: Fix Flooding into Occupied Spaces by Repopulating
+%% Post-processing
 % Get logical mask of occupancy map
 bi_occ_matrix = occupancyMatrix(bi_occ_map);
+% Find obstacle indices
+linear_idx = bi_occ_matrix(bi_occ_matrix==1);
 % Replace with 1 for obstacles
-search_matrix(bi_occ_matrix) = 1;
+search_matrix(linear_idx) = 1;
+
+%% Visualise
+% Create visualizer
+viz = Visualizer2D;
+search_map = binaryOccupancyMap(search_matrix,bi_occ_map.Resolution);
+% viz.mapName = 'map';
+viz.mapName = 'search_map';
+viz(pose);
 
 end
 
