@@ -4,6 +4,7 @@ classdef SearchTestSuite
     %   Detailed explanation goes here
     
     properties
+        bi_occ_map
         unoccupied_area
         searched_area
         search_coverage
@@ -17,11 +18,13 @@ classdef SearchTestSuite
     end
     
     methods
-        function obj = SearchTestSuite(occ_map)
+        function obj = SearchTestSuite(bi_occ_map)
             %SearchTestSuite Construct an instance of this class
+            % Store binary occupancy map
+            obj.bi_occ_map = bi_occ_map;
             
             % Calculate searchable area
-            obj.unoccupied_area = calc_unoccupied_area(occ_map);  % [m^2]
+            obj.unoccupied_area = obj.calc_unoccupied_area();  % [m^2]
             
             % Initialise searched area
             obj.searched_area = 0;  % [m^2]
@@ -36,19 +39,76 @@ classdef SearchTestSuite
             obj.num_collisions = 0;
         end
         
-        function [unoccupied_area,num_unoccupied_cells] = calc_unoccupied_area(obj,occ_map)
+        function [unoccupied_area] = calc_unoccupied_area(obj)
             %unoccupied_area Calculates the total free area in the map
+            bi_occ_matrix = occupancyMatrix(obj.bi_occ_map);
             
-            occupancy_matrix = occupancyMatrix(occ_map);
+            num_occupied_cells = sum(sum(bi_occ_matrix));
 
-            binary_occupancy_matrix = occupancy_matrix>occ_map.ProbabilitySaturation(1);
+            num_unoccupied_cells = numel(bi_occ_matrix) - num_occupied_cells;  % calculate number of unsearched cells
+            unoccupied_area = (1/occ_map.Resolution)^2 * num_unoccupied_cells;  % convert to area
+        end
+        
+        function [] = update_search_matrix(obj,pose)
+            % update_search_matrix Adds the grid units currently in the object 
+            % detector's FoV and DoF to the search matrix
+            %   Within the search matrix:
+            %   0: unsearched
+            %   1: occupied
+            %   2: searched
 
-            num_occupied_cells = sum(sum(binary_occupancy_matrix));
+            %% Setup
+            % Object Detector sensor
+            detector = ObjectDetector;
+            detector.fieldOfView = pi/4;    % [rad]
 
-            num_unoccupied_cells = numel(occupancy_matrix) - num_occupied_cells;      % calculate number of unsearched cells
-            unoccupied_area = (1/occ_map.Resolution)^2 * num_unoccupied_cells;    % convert to area
+            % Camera Config
+            rays = 10;
+            scan_angles = linspace(-(detector.fieldOfView)/2,(detector.fieldOfView)/2,rays);
+            max_range = detector.maxRange;
+
+            % Initialise Ranges of Rays
+            ranges = zeros(size(scan_angles,2),1);
+
+            %% Use rays within FoV / DoF to find indices
+            % Get ranges of each ray in x,y coordinates
+            ranges_xy = rayIntersection(obj.bi_occ_map,pose,scan_angles,max_range);
+
+            % Convert ranges of rays to euclidean distances
+            for i = 1:size(ranges,1)
+                if isnan(ranges_xy(i,1))
+                    ranges(i) = max_range;
+                else
+                    dist_between = [pose(1,1),pose(2,1);ranges_xy(i,1),ranges_xy(i,2)];
+                    ranges(i) = pdist(dist_between,'euclidean');
+                end
+            end
+
+            % Find which grid units the rays intersect and update search matrix
+            for i = 1:size(ranges,1)
+                [end_unit, grid_units] = raycast(bi_occ_map,pose,ranges(i),scan_angles(i));
+
+                % Convert midpoints to linear indices
+                row_idx = [grid_units(:,1); 0];
+                col_idx = [grid_units(:,2); 0];
+                % Add endpoint too
+                row_idx(end) = end_unit(1,1);
+                col_idx(end) = end_unit(1,2);
+                linear_idx = sub2ind(bi_occ_map.GridSize,row_idx,col_idx);
+
+                % Replace raycast indices with 2 to indicate searched
+                obj.search_matrix(linear_idx) = 2;
+            end
+
+            %% Post-processing: Fix Flooding into Occupied Spaces by Repopulating
+            % Get logical mask of occupancy map
+            bi_occ_matrix = occupancyMatrix(bi_occ_map);
+            % Replace with 1 for obstacles
+            obj.search_matrix(bi_occ_matrix) = 1;
 
         end
+
+
     end
 end
 
