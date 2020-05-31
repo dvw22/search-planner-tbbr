@@ -12,7 +12,8 @@ bi_occ_map = binaryOccupancyMap(bi_occ_matrix,resolution);
 
 % Lidar
 % Homemade
-scan_angles = linspace(-pi/6,pi/6,12);
+rays = 12;
+scan_angles = linspace(-pi/6,pi/6,rays);
 max_range = 5;
 ranges = zeros(size(scan_angles,2),1);
 % Object
@@ -63,8 +64,11 @@ for i = 1:size(ranges,1)
         [end_unit, grid_units] = raycast(map,pose,ranges(i),scan_angles(i));
         
         % Convert midpoints to linear indices
-        row_idx = grid_units(:,1);
-        col_idx = grid_units(:,2);
+        row_idx = [grid_units(:,1); 0];
+        col_idx = [grid_units(:,2); 0];
+        % Add endpoint too
+        row_idx(end) = end_unit(1,1);
+        col_idx(end) = end_unit(1,2);
         linear_idx = sub2ind(size_map,row_idx,col_idx);
     end
 
