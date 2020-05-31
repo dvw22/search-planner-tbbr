@@ -8,21 +8,28 @@ resolution = map.Resolution;
 % Binary occupancy map from matrix
 bi_occ_map = binaryOccupancyMap(bi_occ_matrix,resolution);
 
-scan_angles = linspace(-pi/6,pi/6,9);
+% Lidar
+% Object
+area_measure = LidarSensor;
+area_measure.sensorOffset = [0,0];
+area_measure.scanAngles = linspace(-pi/6,pi/6,6);
+area_measure.maxRange = 5;
+% Homemade
+scan_angles = linspace(-pi/6,pi/6,6);
 max_range = 5;
 ranges = zeros(size(scan_angles,2),1);
 
-% Create visualizer
-viz = Visualizer2D;
-viz.mapName = 'bi_occ_map';
-
+% Pose
 initPose = [1; 3; pi/4];        % Initial pose (x y theta)
 pose = initPose;
 
-search_matrix = occupancyMatrix(bi_occ_map);
+% Initialise Search Matrix
+search_matrix = bi_occ_matrix;
 size_map = size(search_matrix);
-search_map = 
 
+% Create visualizer
+viz = Visualizer2D;
+attachLidarSensor(viz,area_measure);
 
 
 % Get ranges
@@ -37,12 +44,21 @@ for i = 1:size(ranges,1)
     end
 end
 
+% Update search map
 for i = 1:size(ranges,1)
     % Check for NaN
     if isnan(ranges(i))
         [end_unit, grid_units] = raycast(map,pose,area_measure.maxRange,area_measure.scanAngles(i));
+        
+        % Add endpoints too
+        
     else
         [end_unit, grid_units] = raycast(map,pose,ranges(i),scan_angles(i));
+        
+        % Convert to linear indices
+        row_idx = grid_units(:,1);
+        col_idx = grid_units(:,2);
+        linear_idx = sub2ind(size_map,row_idx,col_idx);
     end
 
     % Convert to linear indices
@@ -54,4 +70,8 @@ for i = 1:size(ranges,1)
     search_matrix(linear_idx) = 2;
 end
 
-viz(pose)
+% Visualise
+search_map = binaryOccupancyMap(search_matrix,resolution);
+% viz.mapName = 'map';
+viz.mapName = 'search_map';
+viz(pose,ranges)
