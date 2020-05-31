@@ -55,7 +55,7 @@ classdef SearchPlanner
                 % Calculate waypoints before travel first time only
                 if i == 1
                     % Append cell sequence waypoints
-                    [cell_seq_waypoints, num_cells] = cell_seq_search_path(obj.cell_order(i,:),obj.decomposed_matrix,obj.map_resolution,obj.PathPlanner);
+                    [cell_seq_waypoints, num_cells] = obj.cell_seq_search_path(obj.cell_order(i,:));
                     complete_waypoints = [complete_waypoints; cell_seq_waypoints];
 
                     % Append cell sequence indices
@@ -100,7 +100,7 @@ classdef SearchPlanner
                 % Append travel waypoints
                 if i < num_cell_seq
                     % Get next cell sequence waypoints
-                    [next_cell_seq_waypoints, num_cells] = cell_seq_search_path(obj.cell_order(i+1,:),obj.decomposed_matrix,obj.map_resolution,obj.PathPlanner);
+                    [next_cell_seq_waypoints, num_cells] = obj.cell_seq_search_path(obj.cell_order(i+1,:));
 
                     % Get start and end points for travel
                     start_waypoint = cell_seq_waypoints(end,:);  % starting at end of last cell sequence
@@ -305,6 +305,27 @@ classdef SearchPlanner
             end
         end
         
+        function [adjacency_matrix] = connections_adjacency(connections_L,connections_R)
+            % connections_adjacency Returns the adjacency matrix for two neighbouring
+            % connectivity slices
+            %   Detailed explanation goes here
+
+            %% Initialise Matrix
+            adjacency_matrix = zeros(size(connections_L,1), size(connections_R,1)); 
+
+            %% Looping
+            for i = 1:size(connections_L,1)
+                for j = 1:size(connections_R,1)
+                    if min(connections_L(i,2), connections_R(j,2)) - max(connections_L(i,1), connections_R(j,1)) > 0
+                        adjacency_matrix(i, j) = 1;
+                    end
+                end
+            end
+        end
+
+
+        
+        
         function [cell_order] = plan_cell_order(obj,reeb_graph)
             % plan_cell_order Determines what order the cells should be searched for
             % complete coverage
@@ -398,7 +419,7 @@ classdef SearchPlanner
             end
         end
         
-        function [cell_seq_waypoints, num_cells] = cell_seq_search_path(obj,cell_seq,decomposed_map,resolution,planner)
+        function [cell_seq_waypoints, num_cells] = cell_seq_search_path(obj,cell_seq)
             % cell_seq_search_path Outputs waypoints for a set of cells in an optimised order
             %   Gets a row in from a cell order plan matrix. Slices off zeroed
             %   elements. Inputs each element as a cell number to cell_search_path.
@@ -416,20 +437,16 @@ classdef SearchPlanner
             %% Waypoint Generation
             % Get waypoints for each cell and append
             for i = 1:num_cells
-                [cell_waypoints, num_waypoints] = cell_search_path(decomposed_map,cell_seq(i),resolution,planner);
+                [cell_waypoints, num_waypoints] = obj.cell_search_path(cell_seq(i));
                 cell_seq_waypoints = [cell_seq_waypoints; cell_waypoints];
             end
-
-        end
-
-
-        
+        end     
 
         function [cell_waypoints, num_waypoints] = cell_search_path(obj,cell)
             % cell_search path Generates a search path within a cell
             %   Detailed explanation goes here
 
-            [ceiling_idx, floor_idx] = ceil_floor_cell(obj.decomposed_matrix, cell);  
+            [ceiling_idx, floor_idx] = obj.ceil_floor_cell(cell);  
 
             num_ceiling = size(ceiling_idx,1);
             num_waypoints = num_ceiling*2;
@@ -556,10 +573,63 @@ classdef SearchPlanner
 
             % Update number of waypoints due to insertions
             num_waypoints = size(cell_waypoints,1);
-
         end
+        
+        function [cell_ceiling_idx,cell_floor_idx] = ceil_floor_cell(obj,cell)
+            % ceil_floor_cell Generates boustrophedon paths in each cell in a
+            % boustrophedon cell decomposed occupancy map
+            %   Returns indices of matrix [row1,col1; row2,col2; ...]
 
+            % Truncate matrix to cell of interest size
+            zeroed_except_cell = obj.decomposed_matrix==cell;  % zero all other cells
+            col_cut = zeroed_except_cell(:,any(zeroed_except_cell,1));  % cut zero columns
+            truncated_cell = col_cut(any(col_cut,2),:);  % cut zero rows
 
+            % Find cell length and height
+            cell_length = size(truncated_cell,2);
+
+            % Initialise ceiling and floor arrays to track indices
+            cell_ceiling_idx = zeros(cell_length,2);  % [row1,row1; col2,col2; ...]
+            cell_floor_idx = cell_ceiling_idx;
+
+            % Find ceiling offset of cell
+            for i = 1:size(zeroed_except_cell,1)
+                if ~all(zeroed_except_cell(i,:)==0)
+                    ceiling_offset = i-1;
+                    break
+                end
+            end
+
+            % Find left wall offset of cell
+            for i = 1:size(zeroed_except_cell,2)
+                if ~all(zeroed_except_cell(:,i)==0)
+                    leftwall_offset = i-1;
+                    break
+                end
+            end
+
+            % Look for ceiling and floor indices within cell
+            for col = 1:cell_length
+                % Look down through each row until top of cell is found in column slice
+                for i = 1:size(truncated_cell,1)
+                    if truncated_cell(i,col)==1
+                        cell_ceiling_idx(col,1) = i + ceiling_offset;  % store row index
+                        cell_ceiling_idx(col,2) = col + leftwall_offset;  % store col index
+                        break
+                    end
+                end
+
+                % Look up through each row until bottom of cell is found in column
+                % slice
+                for i = size(truncated_cell,1):-1:1
+                    if truncated_cell(i,col)==1
+                        cell_floor_idx(col,1) = i + ceiling_offset;  % store row index
+                        cell_floor_idx(col,2) = col + leftwall_offset;  % store col index
+                        break
+                    end
+                end
+            end
+        end
 
     end
 end
