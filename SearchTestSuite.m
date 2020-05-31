@@ -116,25 +116,8 @@ classdef SearchTestSuite < handle
         end
 
         function [] = view_searched_map(obj)
-            % update_search_matrix Adds the grid units currently in the object 
-            % detector's FoV and DoF to the search matrix
-            % Placeholder pose
-            pose = [2;2;0];
-            
-            % Homemade
-            rays = 10;
-            scan_angles = linspace(-pi/6,pi/6,rays);
-            max_range = 5;
-            ranges = zeros(size(scan_angles,2),1);
-            % Object
-            area_measure = LidarSensor;
-            area_measure.sensorOffset = [0,0];
-            area_measure.scanAngles = scan_angles;
-            area_measure.maxRange = max_range;
-            
-            % Create visualizer
-            Viz = Visualizer2D;
-            attachLidarSensor(Viz,area_measure);
+            %update_search_matrix Adds the grid units currently in the
+            %object detector's FoV and DoF to the search matrix
             
             % Visualise
             search_map = binaryOccupancyMap(obj.search_matrix,obj.bi_occ_map.Resolution);
