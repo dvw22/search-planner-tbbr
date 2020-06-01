@@ -1,7 +1,7 @@
-classdef SearchRobot
+classdef SearchRobot < handle
     %SearchRobot A mobile robot with an object detector and pure pursuit
     %controller used for search robot simulation
-    %   Detailed explanation goes here
+    %   Handle so that the pose can be updated within simulation functions
     
     properties
         Detector

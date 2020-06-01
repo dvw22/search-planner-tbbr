@@ -1,6 +1,6 @@
-function [search_result] = simulate_static_search(Search_robot,Test_suite,Search_planner,opi)
-%simulate_static_search Simulates a mobile robot statically executing a search path on the map.
-%   Detailed explanation goes here
+function [search_result] = simulate_offline_search(Search_robot,Test_suite,Search_planner,opi)
+%simulate_static_search Simulates a mobile robot executing an offline
+%search path on the map.
 
 %% Simulation Loop Setup
 % Time Array
