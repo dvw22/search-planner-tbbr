@@ -20,9 +20,13 @@ classdef SearchTestSuite < handle
     methods
         function obj = SearchTestSuite(occ_map)
             %SearchTestSuite Construct an instance of this class
+            arguments
+                occ_map (1,1) occupancyMap 
+            end
+            
             % Convert to binary occupancy map
             occ_matrix = occupancyMatrix(occ_map);
-            bi_occ_matrix = round(occ_matrix);  % convert to binary matrix ASSUMPTION
+            bi_occ_matrix = occ_matrix >= occ_map.OccupiedThreshold;  % convert to binary matrix
             bi_occ_map = binaryOccupancyMap(bi_occ_matrix,occ_map.Resolution);
             
             % Store binary occupancy map

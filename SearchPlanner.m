@@ -15,11 +15,15 @@ classdef SearchPlanner
     methods
         function obj = SearchPlanner(occ_map)
             %SearchPlanner Construct an instance of this class
+            arguments
+                occ_map (1,1) occupancyMap 
+            end
+            % Store resolution
+            obj.map_resolution = occ_map.Resolution;
             
             % Convert map to binary map
-            obj.map_resolution = occ_map.Resolution;
             occ_matrix = occupancyMatrix(occ_map);
-            bi_occ_matrix = round(occ_matrix);  % convert to binary matrix
+            bi_occ_matrix = occ_matrix >= occ_map.OccupiedThreshold;  % convert to binary matrix
             bi_occ_map = binaryOccupancyMap(bi_occ_matrix,obj.map_resolution);
             
             % Perform cell decomposition of map
