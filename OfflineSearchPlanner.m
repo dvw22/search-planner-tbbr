@@ -292,6 +292,9 @@ classdef OfflineSearchPlanner < handle
                         % Add pair with floor first
                         pair = [floor_idx(i,:); ceiling_idx(i,:)];
                         cell_indices = [cell_indices; pair];
+                        
+                        % Add ceiling next
+                        add_floor = false;
                     % The ceiling index needs to be added first
                     else
                         % Check if there is an edge from previous ceiling
@@ -303,6 +306,9 @@ classdef OfflineSearchPlanner < handle
                         % Add pair with ceiling first
                         pair = [ceiling_idx(i,:); floor_idx(i,:)];
                         cell_indices = [cell_indices; pair];
+                        
+                        % Add floor next
+                        add_floor = true;
                     end
                 end
             end
