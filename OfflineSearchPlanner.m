@@ -78,7 +78,7 @@ classdef OfflineSearchPlanner < handle
             hold off
         end
         
-        function display_decomposed_map(obj)
+        function show_decomposed_map(obj)
             %display_decomposed_map Displays the cells of a decomposed map as different
             %grayscale shades
 

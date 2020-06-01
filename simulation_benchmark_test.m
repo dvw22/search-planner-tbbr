@@ -7,7 +7,7 @@ load exampleMap;
 
 % Inflate map
 inflated_map = copy(map);
-inflate(inflated_map,1,'grid')
+inflate(inflated_map,2,'grid')
 
 %% Other Setup
 % Search Robot Object
@@ -30,7 +30,7 @@ Test_suite.computation_time = toc;
 
 %% Visualisation
 % Plot Path
-% Search_planner.plot_search_path()
+Search_planner.plot_search_path()
 
 % Simulate Search
-result = simulate_offline_search(Search_robot,Test_suite,Search_planner,opi);
+% result = simulate_offline_search(Search_robot,Test_suite,Search_planner,opi);
