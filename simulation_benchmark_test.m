@@ -16,7 +16,7 @@ Search_planner = OfflineSearchPlanner(map);
 Test_suite = SearchTestSuite(map);
 
 % Starting Positions
-Search_robot.pose = [0.75,0.75,pi/2];  % [x, y, theta]
+Search_robot.pose = [0.75; 0.75; pi/2];  % [x, y, theta]
 opi = [0.25, 0.25, 1];  % [x, y, label]
 
 %% Plan Search Path and Measure Computation Time
