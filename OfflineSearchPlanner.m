@@ -1,15 +1,21 @@
-classdef OfflineSearchPlanner
+classdef OfflineSearchPlanner < handle
     %SearchPlanner Offline planner that can calculate a search path within
     %an occupancy map
+    %  Handle because the methods update the object's properties
     
     properties (SetAccess = private)
-        map_resolution
+        bi_occ_map
         decomposed_matrix
         graph
         num_cells
         cell_order
+        complete_waypoints
+        segment_idx
+        init_pose
+    end
+    
+    properties (Access = private)
         PathPlanner
-        Viz
     end
     
     methods
@@ -18,37 +24,79 @@ classdef OfflineSearchPlanner
             arguments
                 occ_map (1,1) occupancyMap 
             end
-            % Store resolution
-            obj.map_resolution = occ_map.Resolution;
-            
             % Convert map to binary map
             occ_matrix = occupancyMatrix(occ_map);
             bi_occ_matrix = occ_matrix >= occ_map.OccupiedThreshold;  % convert to binary matrix
-            bi_occ_map = binaryOccupancyMap(bi_occ_matrix,obj.map_resolution);
+            bi_occ_map = binaryOccupancyMap(bi_occ_matrix,occ_map.Resolution);
             
-            % Perform cell decomposition of map
-            [obj.decomposed_matrix, obj.graph, obj.num_cells] = obj.btd_cell_decomposition(bi_occ_matrix);
+            % Store binary occupancy map
+            obj.bi_occ_map = bi_occ_map;
             
-            % Perform cell order calculation
-            obj.cell_order = obj.plan_cell_order(obj.graph);
+            % Initialise cell decomposition properties
+            obj.decomposed_matrix = [];
+            obj.graph = [];
+            obj.num_cells = [];
+            
+            % Initialise cell order properties
+            obj.cell_order = [];
+            
+            % Initialise search path properties
+            obj.complete_waypoints = [];
+            obj.segment_idx = [];
+            
+            % Initialise start pose
+            obj.init_pose = [];
             
             % Initialise shortest path planner
             obj.PathPlanner = mobileRobotPRM(bi_occ_map);
             obj.PathPlanner.NumNodes = 75;
             obj.PathPlanner.ConnectionDistance = 5;
+        end 
+        
+        function [] = update_search_path(obj,init_pose)
+            % Save init pose
+            obj.init_pose = init_pose;
             
-            % Initialise visualizer
-            obj.Viz = Visualizer2D;
-            obj.Viz.hasWaypoints = true;
-            obj.Viz.mapName = 'map';
+            % Perform cell decomposition of map
+            [obj.decomposed_matrix, obj.graph, obj.num_cells] = obj.btd_cell_decomposition();
+            
+            % Perform cell order calculation
+            obj.cell_order = obj.plan_cell_order();
+            
+            % Calculate waypoints in map
+            [obj.complete_waypoints, obj.segment_idx] = obj.complete_search_path();
         end
         
-        function [complete_waypoints,segment_idx] = complete_search_path(obj,init_pos)
+        function [] = plot_search_path(obj)
+            %plot_path Plots the path as waypoints on the occupancy map
+
+            % Display map
+            show(obj.bi_occ_map)
+            hold on
+            % Plot waypoint connection animation
+            comet(obj.complete_waypoints(:,1),obj.complete_waypoints(:,2))
+            hold off
+        end
+        
+        function display_decomposed_map(obj)
+            %display_decomposed_map Displays the cells of a decomposed map as different
+            %grayscale shades
+
+            imshow(obj.decomposed_matrix, [min(obj.decomposed_matrix(:)),max(obj.decomposed_matrix(:))])
+        end
+    end
+       
+    methods (Access = private)
+        function [complete_waypoints,segment_idx] = complete_search_path(obj)
             % map_search_path Outputs a full waypoint list with a segment indices matrix
             % to access segmented regions during the waypoint planning process.
             %   The segments are either a cell sequence path or a shortest path between
             %   cells.
-
+            
+            % Transform pose to just x,y position
+            init_xy = [obj.init_pose(1), obj.init_pose(2)];
+            
+            
             %% Waypoint Generation
             % Initialise
             complete_waypoints = [];
@@ -76,7 +124,7 @@ classdef OfflineSearchPlanner
                     last_end_idx = end_idx;  % store
 
                     % Plan path to first waypoint
-                    travel_waypoints = findpath(obj.PathPlanner,init_pos,complete_waypoints(1,:));
+                    travel_waypoints = findpath(obj.PathPlanner,init_xy,complete_waypoints(1,:));
                     % The planner may not always find a path if the map is too complex.
                     % This condition is to prevent the code from breaking.
                     if isempty(travel_waypoints) == 0
@@ -149,10 +197,12 @@ classdef OfflineSearchPlanner
             end
         end
         
-        function [cell_order] = plan_cell_order(obj,reeb_graph)
+        function [cell_order] = plan_cell_order(obj)
             % plan_cell_order Determines what order the cells should be searched for
             % complete coverage
-            %   Detailed explanation goes here
+            
+            % Initialise reeb graph
+            reeb_graph = obj.graph;
 
             % Initialise arrays and counters
             cell_order = [];
@@ -242,13 +292,16 @@ classdef OfflineSearchPlanner
             end
         end
         
-        function [decomposed_matrix, reeb_graph, cell_counter] = btd_cell_decomposition(obj,bi_occ_matrix)
+        function [decomposed_matrix, reeb_graph, cell_counter] = btd_cell_decomposition(obj)
             %btd_cell_decomposition Uses boustrophedon cell decomposition to output a
             %region divided occupancy map
             %   The occupancy map must have a border of occupied cells for it to work.
             %   For the output, a 0 is an obstacle and the integers are the
             %   corresponding cell number.
 
+            % Get binary occupancy matrix
+            bi_occ_matrix = occupancyMatrix(obj.bi_occ_map);
+            
             %% Initialise variables
             decomposed_matrix = zeros(size(bi_occ_matrix));
             reeb_graph = digraph;
@@ -405,29 +458,6 @@ classdef OfflineSearchPlanner
                 last_cells = current_cells;
             end
         end
-        
-        function [] = plot_path(obj,complete_waypoints)
-            %plot_path Plots the path as waypoints on the occupancy map
-            % Placeholder pose to use visualizer
-            pose = [0,0,0];
-
-            % Display visualisation
-            obj.Viz(pose,complete_waypoints)
-            hold on
-            % Plot waypoint connection animation
-            comet(complete_waypoints(:,1),complete_waypoints(:,2))
-            hold off
-        end
-        
-        function display_decomposed_map(obj)
-            %display_decomposed_map Displays the cells of a decomposed map as different
-            %grayscale shades
-
-            imshow(obj.decomposed_matrix, [min(obj.decomposed_matrix(:)),max(obj.decomposed_matrix(:))])
-        end
-    end
-       
-    methods (Access = private)
         
         function [connectivity,connections] = slice_connectivity(obj,slice)
             % slice_connectivity Calculates the number of connected segments and
@@ -606,7 +636,7 @@ classdef OfflineSearchPlanner
             cell_waypoints = cell_waypoints - 0.5;
 
             % Perform scaling for resolution
-            cell_waypoints = cell_waypoints/obj.map_resolution;
+            cell_waypoints = cell_waypoints/obj.bi_occ_map.Resolution;
 
 
             %% Post processing to insert waypoint paths between edges
