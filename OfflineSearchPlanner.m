@@ -131,7 +131,7 @@ classdef OfflineSearchPlanner < handle
                         travel_waypoints(1,:) = [];  % Must clear source
                         travel_waypoints(end,:) = [];  % Must clear destination of travel to avoid duplicate
                     else
-                        display(['Path planning failed between cell sequence ',num2str(i),' and ',num2str(i+1),'.'])
+                        disp(['Path planning failed between cell sequence ',num2str(i),' and ',num2str(i+1),'.'])
                     end
                     complete_waypoints = [travel_waypoints; complete_waypoints];
 
@@ -170,8 +170,8 @@ classdef OfflineSearchPlanner < handle
                     % This condition is to prevent the code from breaking.
                     while isempty(travel_waypoints) == 1
                         % Publish info
-                        display(['Path planning failed between cell sequence ',num2str(i),' and ',num2str(i+1),'.'])
-                        display('Increasing nodes and connection distance.')
+                        disp(['Path planning failed between cell sequence ',num2str(i),' and ',num2str(i+1),'.'])
+                        disp('Increasing nodes and connection distance.')
 
                         % Increase nodes and connection distances
                         obj.PathPlanner.NumNodes = obj.PathPlanner.NumNodes * 2;
@@ -215,8 +215,52 @@ classdef OfflineSearchPlanner < handle
             %% Waypoint Generation
             % Get waypoints for each cell and append
             for i = 1:num_cells
-                [cell_waypoints, num_waypoints] = obj.cell_search_path(cell_seq(i));
-                cell_seq_waypoints = [cell_seq_waypoints; cell_waypoints];
+                % First cell calculation
+                if i == 1
+                    % Get first cell waypoints
+                    [cell_waypoints, ~] = obj.cell_search_path(cell_seq(i));
+
+                    % Append to cell sequence
+                    cell_seq_waypoints = [cell_seq_waypoints; cell_waypoints];   
+                % Just finished calculating a travel segment
+                else
+                    % Append previously stored cell waypoints
+                    cell_seq_waypoints = [cell_seq_waypoints; cell_waypoints];
+                end
+                
+                % Calculate path to start waypoint of next cell if not last
+                % cell
+                if i < num_cells
+                    % Get next cell waypoints 
+                    [next_cell_waypoints, ~] = obj.cell_search_path(cell_seq(i+1));
+                    
+                    % Get start and end points for travel
+                    start_waypoint = cell_waypoints(end,:);  % starting at end of last cell sequence
+                    end_waypoint = next_cell_waypoints(1,:);  % ending at start of next cell sequence
+                   
+                    % Append travel waypoints
+                    travel_waypoints = findpath(obj.PathPlanner,start_waypoint,end_waypoint);
+                    % The planner may not always find a path if the map is too complex.
+                    % This condition is to prevent the code from breaking.
+                    while isempty(travel_waypoints) == 1
+                        % Publish info
+                        disp(['Path planning failed between cell sequence ',num2str(i),' and ',num2str(i+1),'.'])
+                        disp('Increasing nodes and connection distance.')
+
+                        % Increase nodes and connection distances
+                        obj.PathPlanner.NumNodes = obj.PathPlanner.NumNodes * 2;
+                        obj.PathPlanner.ConnectionDistance = obj.PathPlanner.ConnectionDistance * 2;
+
+                        % Calculate again
+                        travel_waypoints = findpath(obj.PathPlanner,start_waypoint,end_waypoint);
+                    end    
+                    travel_waypoints(1,:) = [];  % Must clear source of travel to avoid duplicate
+                    travel_waypoints(end,:) = [];  % Must clear destination of travel to avoid duplicate
+                    cell_seq_waypoints = [cell_seq_waypoints; travel_waypoints];
+
+                    % Store next cell waypoints for next sequence
+                    cell_waypoints = next_cell_waypoints;
+                end
             end
         end     
 
