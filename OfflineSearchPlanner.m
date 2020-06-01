@@ -284,9 +284,11 @@ classdef OfflineSearchPlanner < handle
                     % The floor index needs to be added first
                     if add_floor == true
                         % Check if there is an edge from previous floor
-                        if floor_idx(i,1)~=floor_idx(i,1) && i>1
-                            % Track index
-                            insertion_indices = [insertion_indices, size(cell_indices,1)];
+                        if i>1
+                            if floor_idx(i,1)~=floor_idx(i-1,1)
+                                % Track index
+                                insertion_indices = [insertion_indices, size(cell_indices,1)+1];
+                            end
                         end
                         
                         % Add pair with floor first
@@ -298,9 +300,11 @@ classdef OfflineSearchPlanner < handle
                     % The ceiling index needs to be added first
                     else
                         % Check if there is an edge from previous ceiling
-                        if ceiling_idx(i,1)~=ceiling_idx(i,1) && i>1
-                            % Track index
-                            insertion_indices = [insertion_indices, size(cell_indices,1)];
+                        if i>1
+                            if ceiling_idx(i,1)~=ceiling_idx(i-1,1)
+                                % Track index
+                                insertion_indices = [insertion_indices, size(cell_indices,1)+1];
+                            end
                         end
                         
                         % Add pair with ceiling first
