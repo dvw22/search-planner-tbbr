@@ -34,9 +34,9 @@ movement_path = [14,11;
                  
                  10,16
                  
-                 6.1,13;
+                 6.25,13;
                  7,10.5;
-                 6.1,8;
+                 6.25,8;
                  
                  8,4;
 
@@ -111,7 +111,7 @@ for i = 2:numel(time_vector)  % start index at 2nd element
     Test_suite.update_collision(pose(:,i))
     if Test_suite.num_collisions > last_num_collisions
         % Publish info
-        disp(['Collision detected. Total collisions = ', num2str(Test_suite.num_collisions),'.']);
+        disp('NumberCollision detected.');
         
         % Update counter
         last_num_collisions = last_num_collisions + 1;
@@ -122,9 +122,7 @@ for i = 2:numel(time_vector)  % start index at 2nd element
     detections = Search_robot.Detector(pose(:,i),opi);
     if ~isempty(detections)
         % Publish info
-        range = detections(1,1);
-        angle = detections(1,2);
-        disp(['OPI detected ',num2str(range),'m away at angle ',num2str(angle),'rad. Ending search.']);
+        disp('OPI detected. Ending search.');
         
         % Search succeeded
         search_result = true;
@@ -138,7 +136,7 @@ for i = 2:numel(time_vector)  % start index at 2nd element
     % Waypoint reached if robot within radius
     if pdist(dist_between,'euclidean') < waypoint_radius    
         % Publish info
-        disp(['Waypoint ',num2str(next_waypoint_idx-1),'/',num2str(size(movement_path,1)),' reached.'])
+        disp('Waypoint reached.')
 
         % Check if last waypoint is found
         if next_waypoint_idx==size(movement_path,1)+1
