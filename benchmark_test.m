@@ -1,7 +1,6 @@
 clear
 
 %% Map Setup
-% Occupancy matrix from map
 load exampleMap;
 % load complexMap;
 % load OccupancyMap;
@@ -10,22 +9,24 @@ load exampleMap;
 % Search Robot Object
 Search_robot = SearchRobot();
 
-% Starting Positions
-Search_robot.pose = [0.75,0.75,pi/2];  % [x, y, theta]
-opi = [8, 8, 1];  % [x, y, label]
+% Create Search Planner Object
+Search_planner = OfflineSearchPlanner(map);
 
 % Test Suite
 Test_suite = SearchTestSuite(map);
 
-%% Create Search Planner Object
-Search_planner = OfflineSearchPlanner(map);
+% Starting Positions
+Search_robot.pose = [0.75,0.75,pi/2];  % [x, y, theta]
+opi = [0.25, 0.25, 1];  % [x, y, label]
 
-%% Plan Search Path
+%% Plan Search Path and Measure Computation Time
+tic
 Search_planner.update_search_path(Search_robot.pose);
+Test_suite.computation_time = toc;
 
-%% Plot Path
-% Simulation Visualiser
+%% Visualisation
+% Plot Path
 % Search_planner.plot_search_path()
 
-%% Simulate Search
+% Simulate Search
 result = simulate_offline_search(Search_robot,Test_suite,Search_planner,opi);

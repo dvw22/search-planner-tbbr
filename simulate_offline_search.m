@@ -92,7 +92,7 @@ for i = 2:numel(time_vector)  % start index at 2nd element
     Test_suite.update_collision(pose(:,i))
     
     % Add current search time to test suit
-    Test_suite.search_duration = time_vector(i);
+    Test_suite.search_time = time_vector(i);
     
     %% OPI Checking
     % Check if OPI is found

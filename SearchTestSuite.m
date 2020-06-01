@@ -4,7 +4,8 @@ classdef SearchTestSuite < handle
     %   Handle because the methods need to update the object's properties
     
     properties
-        search_duration
+        search_time
+        computation_time
     end
     
     properties (SetAccess = private)
@@ -46,7 +47,7 @@ classdef SearchTestSuite < handle
             obj.search_coverage = obj.searched_area / obj.unoccupied_area;  % [%]
             
             % Initialise search duration
-            obj.search_duration = 0;  % [s]
+            obj.search_time = 0;  % [s]
             
             % Initialise collisions
             obj.num_collisions = 0;
@@ -60,6 +61,9 @@ classdef SearchTestSuite < handle
             
             % Initialise search map
             obj.search_map = occupancyMap(obj.search_occ_matrix,obj.bi_occ_map.Resolution);
+            
+            % Initialise computation speed
+            obj.computation_time = 0;  % [s]
             
             % Initialise last collision
             obj.last_collision = false;
