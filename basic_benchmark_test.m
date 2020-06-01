@@ -8,7 +8,7 @@ load basicMap;
 Search_robot = SearchRobot();
 
 % Test Suite
-Test_suite = SearchTestSuite(basicMap);
+Test_suite = SearchTestSuite(map);
 
 % Starting Positions
 Search_robot.pose = [13; 10; pi/4];  % [x, y, theta]
@@ -64,7 +64,7 @@ last_num_collisions = 0;
 % Simulation Visualiser
 Viz = Visualizer2D;
 Viz.hasWaypoints = true;
-Viz.mapName = 'basicMap';
+Viz.mapName = 'map';
 attachObjectDetector(Viz,Search_robot.Detector);
 Viz.objectColors = [1 0 0;0 1 0;0 0 1];
 Viz.objectMarkers = 'so^';
