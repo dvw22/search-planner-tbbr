@@ -277,10 +277,29 @@ classdef OfflineSearchPlanner < handle
             [ceiling_idx, floor_idx] = obj.ceil_floor_cell(cell);  
 
             for i = 1:size(floor_idx,1)
-                % The floor and ceiling are on the same row
+                % The floor and ceiling are on the same row (tunnel)
                 if floor_idx(i,1) == ceiling_idx(i,1)
                     % Add one of them to the cell waypoint list
                     cell_indices = [cell_indices; floor_idx(i,:)];
+                    
+                    % Check if there is an edge
+                    if i>1
+                        % Tunnel is after a floor point
+                        if add_floor == true
+                            % Compare floors
+                            if floor_idx(i,1)~=floor_idx(i-1,1)
+                                % Track index
+                                insertion_indices = [insertion_indices; size(cell_indices,1)];
+                            end
+                        % Tunnel is after a ceiling point
+                        else
+                            % Compare ceilings
+                            if ceiling_idx(i,1)~=ceiling_idx(i-1,1)
+                                % Track index
+                                insertion_indices = [insertion_indices; size(cell_indices,1)];
+                            end
+                        end
+                    end
                 else
                     % The floor index needs to be added first
                     if add_floor == true
