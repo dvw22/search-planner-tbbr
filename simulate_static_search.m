@@ -80,12 +80,17 @@ for i = 2:numel(time_vector)  % start index at 2nd element
     pose(:,i) = pose(:,i-1) + world_distance;  % Calculate new pose
     Search_robot.pose = pose(:,i);  % Update search robot object
     
-    % Add searched areas to occupancy matrix
-    Test_suite.add_searched_area(pose(:,i))
-    
     % Update visualization
     Viz(pose(:,i),Search_robot.Controller.Waypoints,opi)
     waitfor(rate);
+    
+    %% Searched Area Updating
+    % Add searched areas to test suite search map
+    Test_suite.add_searched_area(pose(:,i))
+    
+    %% Collision Updating
+    % Add collisions to test suite collision counter
+    Test_suite.update_collision(pose(:,i))
     
     %% OPI Checking
     % Check if OPI is found

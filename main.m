@@ -2,8 +2,8 @@ clear
 
 %% Map Setup
 % Occupancy matrix from map
-% load exampleMap;
-load complexMap;
+load exampleMap;
+% load complexMap;
 % load OccupancyMap;
 
 %% Other Setup
