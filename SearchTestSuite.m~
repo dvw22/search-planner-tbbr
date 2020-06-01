@@ -9,20 +9,25 @@ classdef SearchTestSuite < handle
         search_coverage
         search_duration
         num_collisions
-        
+        search_map
     end
     
     properties (Access = private)
         searched_area
         search_matrix
+        last_collision
+        search_occ_matrix
     end
     
     methods
         function obj = SearchTestSuite(occ_map)
             %SearchTestSuite Construct an instance of this class
+            arguments
+                occ_map (1,1) occupancyMap 
+            end
             % Convert to binary occupancy map
             occ_matrix = occupancyMatrix(occ_map);
-            bi_occ_matrix = round(occ_matrix);  % convert to binary matrix ASSUMPTION
+            bi_occ_matrix = occ_matrix >= occ_map.OccupiedThreshold;  % convert to binary matrix
             bi_occ_map = binaryOccupancyMap(bi_occ_matrix,occ_map.Resolution);
             
             % Store binary occupancy map
@@ -45,6 +50,16 @@ classdef SearchTestSuite < handle
             
             % Initialise search matrix
             obj.search_matrix = double(occupancyMatrix(bi_occ_map));
+            
+            % Initialise search occupancy matrix
+            obj.search_occ_matrix = obj.search_matrix;
+            obj.search_occ_matrix(obj.search_occ_matrix==2) = 0.5;
+            
+            % Initialise search map
+            obj.search_map = occupancyMap(obj.search_occ_matrix,obj.bi_occ_map.Resolution);
+            
+            % Initialise last collision
+            obj.last_collision = false;
         end
         
         function [unoccupied_area] = calc_unoccupied_area(obj)
@@ -116,18 +131,42 @@ classdef SearchTestSuite < handle
             
             % Update search coverage statistic
             obj.update_search_coverage();
+            % Update search map
+            view_search_matrix = (obj.search_matrix==2);
+            view_search_matrix(view_search_matrix==2) = 0.5;
+            
+            view_search_matrix(view_search_matrix==2) = 0.5;
             
         end
 
         function [] = view_searched_map(obj)
             %update_search_matrix Adds the grid units currently in the
             %object detector's FoV and DoF to the search matrix
+            % Setup viewing search matrix
+            view_search_matrix = obj.search_matrix;
+            
+            view_search_matrix(view_search_matrix==2) = 0.5;
             
             % Visualise
-            search_map = binaryOccupancyMap(obj.search_matrix,obj.bi_occ_map.Resolution);
-            show(search_map)
+            show(obj.search_map)
         end
         
+        function [] = update_collision(obj,pose)
+            % Pose is in an occupied space
+            if getOccupancy(obj.bi_occ_map,[pose(1),pose(2)])==1
+                % Add to counter if wasn't in a collision previously
+                if obj.last_collision == false
+                    obj.num_collisions = obj.num_collisions + 1;
+                end
+
+                % Update last collision flag
+                obj.last_collision = true;
+                
+            % Pose is not in an occupied space
+            else
+                obj.last_collision = false;
+            end
+        end
     end
     
     methods (Access = private)
@@ -151,14 +190,11 @@ classdef SearchTestSuite < handle
             obj.searched_area = (1/obj.bi_occ_map.Resolution)^2 * num_searched_units;  % convert to area
         end
         
-        function [collision] = check_collision(obj,pose)
-            % Pose is in an occupied space
-            if getOccupancy(obj.bi_occ_map,[pose(1),pose(2)])==1
-                collision = true;
-            % Pose is not in an occupied space
-            else
-                collision = false;
-            end
+        function [] = update_search_map(obj)
+            %update_search_map Updates the search map based on the
+            %search_matrix
+            obj.search_occ_matrix(obj.search_occ_matrix==2) = 0.5;
+            obj.search_map = 
         end
     end
 end

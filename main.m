@@ -15,6 +15,9 @@ Search_robot.pose = [0.75,0.75,pi/2];  % [x, y, theta]
 start_position = [Search_robot.pose(1), Search_robot.pose(2)];  % [x, y]
 opi = [8, 8, 1];  % [x, y, label]
 
+% Test Suite
+Test_suite = SearchTestSuite(map);
+
 %% Create Search Planner Object (Decomposes Map and Plans Cell Order)
 Search_planner = SearchPlanner(map);
 
@@ -23,7 +26,7 @@ Search_planner = SearchPlanner(map);
 
 %% Plot Path
 % Simulation Visualiser
-Search_planner.plot_path(complete_waypoints)
+% Search_planner.plot_path(complete_waypoints)
 
 %% Simulate Search
-result = simulate_static_search(Search_robot,opi,complete_waypoints,segment_idx);
+result = simulate_static_search(Search_robot,Test_suite,opi,complete_waypoints,segment_idx);
