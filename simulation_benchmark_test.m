@@ -1,8 +1,8 @@
 clear
 
 %% Map Setup
-% load exampleMap;
-load complexMap;
+load exampleMap;
+% load complexMap;
 % load lidarMap;
 
 % Inflate map
@@ -30,7 +30,7 @@ Test_suite.computation_time = toc;
 
 %% Visualisation
 % Plot Path
-Search_planner.plot_search_path()
+% Search_planner.plot_search_path()
 
 % Simulate Search
-% result = simulate_offline_search(Search_robot,Test_suite,Search_planner,opi);
+result = simulate_offline_search(Search_robot,Test_suite,Search_planner,opi);
