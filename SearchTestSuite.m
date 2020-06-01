@@ -14,6 +14,7 @@ classdef SearchTestSuite < handle
     properties (Access = private)
         searched_area
         search_matrix
+        last_collision
     end
     
     methods
@@ -44,6 +45,9 @@ classdef SearchTestSuite < handle
             
             % Initialise search matrix
             obj.search_matrix = double(occupancyMatrix(bi_occ_map));
+            
+            % Initialise last collision
+            obj.last_collision = false;
         end
         
         function [unoccupied_area] = calc_unoccupied_area(obj)
@@ -127,6 +131,22 @@ classdef SearchTestSuite < handle
             show(search_map)
         end
         
+                function [] = update_collision(obj,pose)
+            % Pose is in an occupied space
+            if getOccupancy(obj.bi_occ_map,[pose(1),pose(2)])==1
+                % Add to counter if wasn't in a collision previously
+                if obj.last_collision == false
+                    obj.num_collisions = obj.num_collisions + 1;
+                end
+
+                % Update last collision flag
+                obj.last_collision = true;
+                
+            % Pose is not in an occupied space
+            else
+                obj.last_collision = false;
+            end
+        end
     end
     
     methods (Access = private)
