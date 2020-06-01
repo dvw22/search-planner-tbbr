@@ -116,12 +116,12 @@ for i = 2:numel(time_vector)  % start index at 2nd element
         disp(['Waypoint ',num2str(waypoint_idx-1),'/',num2str(num_waypoints),' in segment ',num2str(segment-1),'/',num2str(num_segments),' reached.'])
                 
         % Segment complete
-        if waypoint_idx == num_waypoints
+        if waypoint_idx == num_waypoints+1
             % Publish info
             disp('End of segment reached.')
             
             % Last segment complete
-            if segment == num_segments
+            if segment == num_segments+1
                 % Publish info
                 disp('End of complete search path reached. Ending search.');
             
