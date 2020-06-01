@@ -162,6 +162,12 @@ classdef SearchPlanner
             hold off
         end
         
+        function display_decomposed_map(obj)
+            %display_decomposed_map Displays the cells of a decomposed map as different
+            %grayscale shades
+
+            imshow(obj.decomposed_matrix, [min(obj.decomposed_matrix(:)),max(obj.decomposed_matrix(:))])
+        end
     end
        
     methods (Access = private)
