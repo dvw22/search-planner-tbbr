@@ -6,13 +6,13 @@ classdef SearchTestSuite < handle
     properties
         bi_occ_map
         unoccupied_area
-        searched_area
         search_coverage
         search_duration
         num_collisions
     end
     
     properties (Access = private)
+        searched_area
         search_matrix
     end
     
@@ -56,18 +56,13 @@ classdef SearchTestSuite < handle
             unoccupied_area = (1/obj.bi_occ_map.Resolution)^2 * num_unoccupied_units;  % convert to area
         end
         
-        function [] = update_searched_area(obj)
-            %update_searched_area Calculates the total searched area in the map 
-            % Get logical mask of search grid units
-            searched = obj.search_matrix==2;
-            
-            num_searched_units = sum(sum(searched));
-
-            obj.searched_area = (1/obj.bi_occ_map.Resolution)^2 * num_searched_units;  % convert to area
-        end
-        
         function [] = update_search_coverage(obj)
             %unoccupied_area Calculates the current search coverage
+            % Update searched area
+            obj.update_searched_area()
+            
+            % Calculate search coverage
+            obj.search_coverage = 100 * (obj.searched_area/obj.unoccupied_area);
         end
         
         function [] = update_search_matrix(obj,pose)
@@ -136,9 +131,20 @@ classdef SearchTestSuite < handle
             search_map = binaryOccupancyMap(obj.search_matrix,obj.bi_occ_map.Resolution);
             show(search_map)
         end
+        
+    end
+    
+    methods (Access = private)
+        function [] = update_searched_area(obj)
+            %update_searched_area Calculates the current total searched area in the map 
+            
+            % Get logical mask of search grid units
+            searched = obj.search_matrix==2;
+            
+            num_searched_units = sum(sum(searched));
 
-        
-        
+            obj.searched_area = (1/obj.bi_occ_map.Resolution)^2 * num_searched_units;  % convert to area
+        end
     end
 end
 
