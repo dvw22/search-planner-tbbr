@@ -27,7 +27,7 @@ classdef SearchRobot < handle
             
             % Pure Pursuit Controller
             obj.Controller = controllerPurePursuit;
-            obj.Controller.LookaheadDistance = 0.5 * 0.5;  % [m]
+            obj.Controller.LookaheadDistance = 0.5 * 0.3;  % [m]
             obj.Controller.DesiredLinearVelocity = 0.75 * 2;  % [m/s]
             obj.Controller.MaxAngularVelocity = 1.5 * 16;  % [rad/s]
             
