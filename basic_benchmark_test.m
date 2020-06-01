@@ -11,13 +11,36 @@ Search_robot = SearchRobot();
 Test_suite = SearchTestSuite(basicMap);
 
 % Starting Positions
-Search_robot.pose = [10; 13; pi/2];  % [x, y, theta]
-opi = [10, 5, 1];  % [x, y, label]
+Search_robot.pose = [13; 10; pi/4];  % [x, y, theta]
+opi = [3, 11, 1];  % [x, y, label]
 
 % Waypoints
-movement_path = [14,14;
-                 12,12;
-                 10,10];
+movement_path = [14,11;
+                 14.5,12;
+                 14,13;
+                 13,13.5;
+                 12,13;
+                 11.5,12;
+                 12,11;
+                 13,10;
+                 14,9;
+                 14.5,8;
+                 14,7
+                 13,6.5;
+                 12,7;
+                 11.5,8;
+                 12,9;
+                 13,10
+                 
+                 10,16
+                 
+                 6.25,13;
+                 7,10.5;
+                 6.25,8;
+                 
+                 8,4;
+
+                 3,10];
 
 
 %% Simulation
@@ -35,6 +58,7 @@ pose(:,1) = Search_robot.pose;  % Add initial condition
 % Initialise Waypoint Flag and Index
 new_waypoint = true;
 next_waypoint_idx = 1;
+last_num_collisions = 0;
 
 %% Environment Setup
 % Simulation Visualiser
@@ -85,6 +109,13 @@ for i = 2:numel(time_vector)  % start index at 2nd element
     %% Test Suite Updating
     % Add collisions to test suite collision counter
     Test_suite.update_collision(pose(:,i))
+    if Test_suite.num_collisions > last_num_collisions
+        % Publish info
+        disp('Collision detected.');
+        
+        % Update counter
+        last_num_collisions = last_num_collisions + 1;
+    end
     
     %% OPI Checking
     % Check if OPI is found
@@ -120,5 +151,4 @@ for i = 2:numel(time_vector)  % start index at 2nd element
             new_waypoint = true;
         end
     end 
-    
 end
