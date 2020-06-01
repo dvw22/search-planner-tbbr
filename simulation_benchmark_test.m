@@ -1,13 +1,13 @@
 clear
 
 %% Map Setup
-load exampleMap;
-% load complexMap;
+% load exampleMap;
+load complexMap;
 % load lidarMap;
 
 % Inflate map
 inflated_map = copy(map);
-inflate(inflated_map,2,'grid')
+inflate(inflated_map,1,'grid')
 
 %% Other Setup
 % Search Robot Object

@@ -85,8 +85,9 @@ classdef OfflineSearchPlanner < handle
             imshow(obj.decomposed_matrix, [min(obj.decomposed_matrix(:)),max(obj.decomposed_matrix(:))])
         end
     end
-       
-    methods (Access = private)
+    
+    methods
+%     methods (Access = private)
         function [complete_waypoints,segment_idx] = complete_search_path(obj)
             % map_search_path Outputs a full waypoint list with a segment indices matrix
             % to access segmented regions during the waypoint planning process.
@@ -287,7 +288,7 @@ classdef OfflineSearchPlanner < handle
                         if i>1
                             if floor_idx(i,1)~=floor_idx(i-1,1)
                                 % Track index
-                                insertion_indices = [insertion_indices, size(cell_indices,1)+1];
+                                insertion_indices = [insertion_indices; size(cell_indices,1)+1];
                             end
                         end
                         
@@ -303,7 +304,7 @@ classdef OfflineSearchPlanner < handle
                         if i>1
                             if ceiling_idx(i,1)~=ceiling_idx(i-1,1)
                                 % Track index
-                                insertion_indices = [insertion_indices, size(cell_indices,1)+1];
+                                insertion_indices = [insertion_indices; size(cell_indices,1)+1];
                             end
                         end
                         
