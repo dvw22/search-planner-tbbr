@@ -1,4 +1,4 @@
-function [search_result] = simulate_static_search(Search_robot,Test_suite,opi,map_waypoints,segment_idx)
+function [search_result] = simulate_static_search(Search_robot,Test_suite,Search_planner,opi)
 %simulate_static_search Simulates a mobile robot statically executing a search path on the map.
 %   Detailed explanation goes here
 
@@ -19,7 +19,7 @@ Test_suite.add_searched_area(pose(:,1));
 segment = 1;
 new_segment = true;
 new_waypoint = true;
-num_segments = size(segment_idx,1);
+num_segments = size(Search_planner.segment_idx,1);
 
 %% Environment Setup
 % Simulation Visualiser
@@ -40,9 +40,9 @@ for i = 2:numel(time_vector)  % start index at 2nd element
     % Get new search path if starting a new segment
     if new_segment == true
         % Get new segment
-        seg_start_idx = segment_idx(segment,1);
-        seg_end_idx = segment_idx(segment,2);
-        search_path = map_waypoints(seg_start_idx:seg_end_idx,:);
+        seg_start_idx = Search_planner.segment_idx(segment,1);
+        seg_end_idx = Search_planner.segment_idx(segment,2);
+        search_path = Search_planner.complete_waypoints(seg_start_idx:seg_end_idx,:);
         
         % Update indices and flag
         segment = segment + 1;  % move to next segment next time
