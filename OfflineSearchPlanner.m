@@ -1,6 +1,6 @@
-classdef SearchPlanner
-    %SearchPlanner Object that can calculate a search path within an
-    %occupancy map
+classdef OfflineSearchPlanner
+    %SearchPlanner Offline planner that can calculate a search path within
+    %an occupancy map
     
     properties (SetAccess = private)
         map_resolution
@@ -13,7 +13,7 @@ classdef SearchPlanner
     end
     
     methods
-        function obj = SearchPlanner(occ_map)
+        function obj = OfflineSearchPlanner(occ_map)
             %SearchPlanner Construct an instance of this class
             arguments
                 occ_map (1,1) occupancyMap 

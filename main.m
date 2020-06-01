@@ -19,7 +19,7 @@ opi = [8, 8, 1];  % [x, y, label]
 Test_suite = SearchTestSuite(map);
 
 %% Create Search Planner Object (Decomposes Map and Plans Cell Order)
-Search_planner = SearchPlanner(map);
+Search_planner = OfflineSearchPlanner(map);
 
 %% Plan Search Path
 [complete_waypoints, segment_idx] = Search_planner.complete_search_path(start_position);
