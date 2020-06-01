@@ -3,7 +3,7 @@ clear
 %% Map Setup
 load exampleMap;
 % load complexMap;
-% load OccupancyMap;
+% load lidarMap;
 
 % Inflate map
 inflated_map = copy(map);
