@@ -3,7 +3,7 @@ classdef SearchTestSuite < handle
     %simulation.
     %   Handle because the methods need to update the object's properties
     
-    properties
+    properties (SetAccess = private)
         bi_occ_map
         unoccupied_area
         search_coverage
@@ -56,16 +56,7 @@ classdef SearchTestSuite < handle
             unoccupied_area = (1/obj.bi_occ_map.Resolution)^2 * num_unoccupied_units;  % convert to area
         end
         
-        function [] = update_search_coverage(obj)
-            %unoccupied_area Calculates the current search coverage
-            % Update searched area
-            obj.update_searched_area()
-            
-            % Calculate search coverage
-            obj.search_coverage = 100 * (obj.searched_area/obj.unoccupied_area);
-        end
-        
-        function [] = update_search_matrix(obj,pose)
+        function [] = add_searched_area(obj,pose)
             % update_search_matrix Adds the grid units currently in the object 
             % detector's FoV and DoF to the search matrix
             %   Within the search matrix:
@@ -121,6 +112,10 @@ classdef SearchTestSuite < handle
             bi_occ_matrix = occupancyMatrix(obj.bi_occ_map);
             % Replace with 1 for obstacles
             obj.search_matrix(bi_occ_matrix) = 1;
+            
+            % Update search coverage statistic
+            obj.update_search_coverage();
+            
         end
 
         function [] = view_searched_map(obj)
@@ -135,6 +130,15 @@ classdef SearchTestSuite < handle
     end
     
     methods (Access = private)
+        function [] = update_search_coverage(obj)
+            %unoccupied_area Calculates the current search coverage
+            % Update searched area
+            obj.update_searched_area()
+            
+            % Calculate search coverage
+            obj.search_coverage = 100 * (obj.searched_area/obj.unoccupied_area);
+        end
+        
         function [] = update_searched_area(obj)
             %update_searched_area Calculates the current total searched area in the map 
             
