@@ -129,13 +129,17 @@ classdef SearchTestSuite < handle
         function [] = view_searched_map(obj)
             %update_search_matrix Adds the grid units currently in the
             %object detector's FoV and DoF to the search matrix
+            % Setup viewing search matrix
+            view_search_matrix = obj.search_matrix;
+            
+            view_search_matrix(view_search_matrix==2) = 0.5;
             
             % Visualise
-            search_map = binaryOccupancyMap(obj.search_matrix,obj.bi_occ_map.Resolution);
+            search_map = occupancyMap(view_search_matrix,obj.bi_occ_map.Resolution);
             show(search_map)
         end
         
-                function [] = update_collision(obj,pose)
+        function [] = update_collision(obj,pose)
             % Pose is in an occupied space
             if getOccupancy(obj.bi_occ_map,[pose(1),pose(2)])==1
                 % Add to counter if wasn't in a collision previously
