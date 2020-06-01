@@ -279,29 +279,29 @@ classdef OfflineSearchPlanner < handle
                 % The floor and ceiling are on the same row
                 if floor_idx(i,1) == ceiling_idx(i,1)
                     % Add one of them to the cell waypoint list
-                    cell_indices = [cell_indices; floor_idx(i,:)];
+                    cell_indices = [cell_indices; floor(i,:)];
                 else
                     % The floor index needs to be added first
                     if add_floor == true
                         % Check if there is an edge from previous floor
-                        if floor_idx(i,1)~=floor_idx(i,1) && i>1
+                        if floor(i,1)~=floor(i,1) && i>1
                             % Track index
                             insertion_indices = [insertion_indices, size(cell_indices,1)];
                         end
                         
                         % Add pair with floor first
-                        pair = [floor_idx(i,:); ceiling_idx(i,:)];
+                        pair = [floor(i,:), ceiling(i,:)];
                         cell_indices = [cell_indices; pair];
                     % The ceiling index needs to be added first
                     else
                         % Check if there is an edge from previous ceiling
-                        if ceiling_idx(i,1)~=ceiling_idx(i,1) && i>1
+                        if ceiling(i,1)~=ceiling(i,1) && i>1
                             % Track index
                             insertion_indices = [insertion_indices, size(cell_indices,1)];
                         end
                         
                         % Add pair with ceiling first
-                        pair = [ceiling_idx(i,:); floor_idx(i,:)];
+                        pair = [ceiling(i,:), floor(i,:)];
                         cell_indices = [cell_indices; pair];
                     end
                 end
@@ -359,7 +359,7 @@ classdef OfflineSearchPlanner < handle
                 insertion_offset = insertion_offset + size(inserted_path,1);
             end
 
-            % Get final number of waypoints
+            % G number of waypoints due to insertions
             num_waypoints = size(cell_waypoints,1);
         end
         
