@@ -84,13 +84,15 @@ for i = 2:numel(time_vector)  % start index at 2nd element
     Viz(pose(:,i),Search_robot.Controller.Waypoints,opi)
     waitfor(rate);
     
-    %% Searched Area Updating
+    %% Test Suite Updating
     % Add searched areas to test suite search map
     Test_suite.add_searched_area(pose(:,i))
-    
-    %% Collision Updating
+
     % Add collisions to test suite collision counter
     Test_suite.update_collision(pose(:,i))
+    
+    % Add current search time to test suit
+    Test_suite.search_duration = time_vector(i);
     
     %% OPI Checking
     % Check if OPI is found

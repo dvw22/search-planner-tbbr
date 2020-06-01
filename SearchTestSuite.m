@@ -3,11 +3,14 @@ classdef SearchTestSuite < handle
     %simulation.
     %   Handle because the methods need to update the object's properties
     
+    properties
+        search_duration
+    end
+    
     properties (SetAccess = private)
         bi_occ_map
         unoccupied_area
         search_coverage
-        search_duration
         num_collisions
         search_map
     end

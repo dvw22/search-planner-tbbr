@@ -28,4 +28,4 @@ Search_planner.update_search_path(Search_robot.pose);
 % Search_planner.plot_search_path()
 
 %% Simulate Search
-result = simulate_static_search(Search_robot,Test_suite,Search_planner,opi);
+result = simulate_offline_search(Search_robot,Test_suite,Search_planner,opi);
