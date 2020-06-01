@@ -14,7 +14,6 @@ pose(:,1) = Search_robot.pose;  % Add initial condition
 
 % Initialise Search Map
 Test_suite.add_searched_area(pose(:,1));
-search_map = Test_suite.search_map;
 
 % Search Waypoint Indexing and Flags and Info
 segment = 1;

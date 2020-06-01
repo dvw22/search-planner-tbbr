@@ -2,18 +2,6 @@ function [search_result] = simulate_static_search(Search_robot,Test_suite,opi,ma
 %simulate_static_search Simulates a mobile robot statically executing a search path on the map.
 %   Detailed explanation goes here
 
-%% Environment Setup
-% Simulation Visualiser
-Viz = Visualizer2D;
-Viz.hasWaypoints = true;
-Viz.mapName = 'search_map';
-attachObjectDetector(Viz,Search_robot.Detector);
-Viz.objectColors = [1 0 0;0 1 0;0 0 1];
-Viz.objectMarkers = 'so^';
-
-% Waypoint Reached Radius
-waypoint_radius = 0.5;  % [m]
-
 %% Simulation Loop Setup
 % Time Array
 sample_time = 0.1;  % [s]
@@ -25,7 +13,6 @@ pose = zeros(3,numel(time_vector));  % Initialise array, [x, y, theta] * time ve
 pose(:,1) = Search_robot.pose;  % Add initial condition
 
 % Initialise Search Map
-search_map = Test_suite.occ_map;
 Test_suite.add_searched_area(pose(:,1));
 
 % Search Waypoint Indexing and Flags and Info
@@ -33,6 +20,18 @@ segment = 1;
 new_segment = true;
 new_waypoint = true;
 num_segments = size(segment_idx,1);
+
+%% Environment Setup
+% Simulation Visualiser
+Viz = Visualizer2D;
+Viz.hasWaypoints = true;
+Viz.mapName = 'map';
+attachObjectDetector(Viz,Search_robot.Detector);
+Viz.objectColors = [1 0 0;0 1 0;0 0 1];
+Viz.objectMarkers = 'so^';
+
+% Waypoint Reached Radius
+waypoint_radius = 0.5;  % [m]
 
 %% Simulation Loop
 rate = rateControl(1/sample_time);
@@ -82,7 +81,8 @@ for i = 2:numel(time_vector)  % start index at 2nd element
     Search_robot.pose = pose(:,i);  % Update search robot object
     
     % Add searched areas to occupancy matrix
-    
+    Test_suite.add_searched_area(pose(:,i))
+    search_m
     
     % Update visualization
     Viz(pose(:,i),Search_robot.Controller.Waypoints,opi)
