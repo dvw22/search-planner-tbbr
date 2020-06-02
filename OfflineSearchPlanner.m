@@ -26,7 +26,7 @@ classdef OfflineSearchPlanner < handle
             end
             % Convert map to binary map
             occ_matrix = occupancyMatrix(occ_map);
-            bi_occ_matrix = occ_matrix >= occ_map.OccupiedThreshold;  % convert to binary matrix
+            bi_occ_matrix = occ_matrix >= occ_map.DefaultValue;  % convert to binary matrix
             bi_occ_map = binaryOccupancyMap(bi_occ_matrix,occ_map.Resolution);
             
             % Store binary occupancy map

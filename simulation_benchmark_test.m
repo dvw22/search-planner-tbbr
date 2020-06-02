@@ -3,13 +3,13 @@ clear
 %% Map Setup
 % load exampleMap;
 % load complexMap;
-% load lidarMap;
+load lidarMap;
 % load outdoorEasyMap
 % load outdoorMediumMap
 % load outdoorHardMap
 % load indoorEasyMap
 % load indoorMediumMap
-load indoorHardMap
+% load indoorHardMap
 
 % Inflate map
 inflated_map = copy(map);
