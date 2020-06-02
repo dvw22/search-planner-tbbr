@@ -114,7 +114,7 @@ classdef OfflineSearchPlanner < handle
                 % Calculate waypoints before travel first time only
                 if i == 1
                     % Append cell sequence waypoints
-                    [cell_seq_waypoints, num_cells] = obj.cell_seq_search_path(obj.cell_order(i,:));
+                    [cell_seq_waypoints, num_cells_in_seq] = obj.cell_seq_search_path(obj.cell_order(i,:));
                     complete_waypoints = [complete_waypoints; cell_seq_waypoints];
 
                     % Append cell sequence indices
@@ -159,7 +159,7 @@ classdef OfflineSearchPlanner < handle
                 % Append travel waypoints
                 if i < num_cell_seq
                     % Get next cell sequence waypoints
-                    [next_cell_seq_waypoints, num_cells] = obj.cell_seq_search_path(obj.cell_order(i+1,:));
+                    [next_cell_seq_waypoints, num_cells_in_seq] = obj.cell_seq_search_path(obj.cell_order(i+1,:));
 
                     % Get start and end points for travel
                     start_waypoint = cell_seq_waypoints(end,:);  % starting at end of last cell sequence
@@ -198,7 +198,7 @@ classdef OfflineSearchPlanner < handle
             end
         end
         
-        function [cell_seq_waypoints, num_cells] = cell_seq_search_path(obj,cell_seq)
+        function [cell_seq_waypoints, num_cells_in_seq] = cell_seq_search_path(obj,cell_seq)
             % cell_seq_search_path Outputs waypoints for a set of cells in an optimised order
             %   Gets a row in from a cell order plan matrix. Slices off zeroed
             %   elements. Inputs each element as a cell number to cell_search_path.
@@ -211,11 +211,11 @@ classdef OfflineSearchPlanner < handle
             %% Initialise
             % Initialise
             cell_seq_waypoints = [];  % reset search path
-            num_cells = size(cell_seq,2);
+            num_cells_in_seq = size(cell_seq,2);
 
             %% Waypoint Generation
             % Get waypoints for each cell and append
-            for i = 1:num_cells
+            for i = 1:num_cells_in_seq
                 % First cell calculation
                 if i == 1
                     % Get first cell waypoints
@@ -231,7 +231,7 @@ classdef OfflineSearchPlanner < handle
                 
                 % Calculate path to start waypoint of next cell if not last
                 % cell
-                if i < num_cells
+                if i < num_cells_in_seq
                     % Get next cell waypoints 
                     [next_cell_waypoints, ~] = obj.cell_search_path(cell_seq(i+1));
                     
@@ -688,9 +688,9 @@ classdef OfflineSearchPlanner < handle
                             reeb_graph = addnode(reeb_graph,1);
 
                         end
-                    end
+                    end              
                 end
-
+                
                 %% Update map
                 % No connectivity means a full line of obstacles
                 if connectivity == 0
@@ -709,6 +709,16 @@ classdef OfflineSearchPlanner < handle
                 last_connections = connections;
                 last_cells = current_cells;
             end
+            
+            %% Split/Join Post-processing
+            % Split/join conditions (where a cell splits into two
+            % new cells, but one of the new cells is also joined to
+            % another previous cell) will add incorrect offsetting 
+            % of the cell counter due to double counting of a
+            % segment. To fix this, the following code is used.
+            
+            
+            
         end
         
         function [connectivity,connections] = slice_connectivity(obj,slice)
