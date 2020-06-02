@@ -1,9 +1,10 @@
 clear
 
 %% Map Setup
-load exampleMap;
+% load exampleMap;
 % load complexMap;
 % load lidarMap;
+load outdoorHardMap
 
 % Inflate map
 inflated_map = copy(map);
