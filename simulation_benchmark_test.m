@@ -8,8 +8,8 @@ clear
 % load outdoorMediumMap
 % load outdoorHardMap
 % load indoorEasyMap
-% load indoorMediumMap
-load indoorHardMap
+load indoorMediumMap
+% load indoorHardMap
 
 % Inflate map
 inflated_map = copy(map);
