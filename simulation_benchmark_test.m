@@ -4,7 +4,12 @@ clear
 % load exampleMap;
 % load complexMap;
 % load lidarMap;
-load outdoorHardMap
+% load outdoorEasyMap
+% load outdoorMediumMap
+% load outdoorHardMap
+load indoorEasyMap
+% load indoorMediumMap
+% load indoorHardMap
 
 % Inflate map
 inflated_map = copy(map);
