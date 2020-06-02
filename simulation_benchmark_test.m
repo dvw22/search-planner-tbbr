@@ -3,13 +3,13 @@ clear
 %% Map Setup
 % load exampleMap;
 % load complexMap;
-load lidarMap;
+% load lidarMap;
 % load outdoorEasyMap
 % load outdoorMediumMap
 % load outdoorHardMap
 % load indoorEasyMap
 % load indoorMediumMap
-% load indoorHardMap
+load indoorHardMap
 
 % Inflate map
 inflated_map = copy(map);
@@ -26,7 +26,7 @@ Search_planner = OfflineSearchPlanner(inflated_map);
 Test_suite = SearchTestSuite(map);
 
 % Starting Positions
-Search_robot.pose = [3; 2; pi/2];  % [x, y, theta]
+Search_robot.pose = [1.25; 18.75; pi/2];  % [x, y, theta]
 opi = [0.25, 0.25, 1];  % [x, y, label]
 
 %% Plan Search Path and Measure Computation Time

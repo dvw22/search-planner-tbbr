@@ -86,8 +86,7 @@ classdef OfflineSearchPlanner < handle
         end
     end
     
-    methods
-%     methods (Access = private)
+    methods (Access = private)
         function [complete_waypoints,segment_idx] = complete_search_path(obj)
             % map_search_path Outputs a full waypoint list with a segment indices matrix
             % to access segmented regions during the waypoint planning process.
