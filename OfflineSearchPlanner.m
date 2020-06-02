@@ -544,7 +544,7 @@ classdef OfflineSearchPlanner < handle
             end
         end
         
-        function [decomposed_matrix, reeb_graph, cell_counter] = btd_cell_decomposition(obj)
+        function [decomposed_matrix, reeb_graph, num_cells] = btd_cell_decomposition(obj)
             %btd_cell_decomposition Uses boustrophedon cell decomposition to output a
             %region divided occupancy map
             %   The occupancy map must have a border of occupied cells for it to work.
@@ -716,9 +716,25 @@ classdef OfflineSearchPlanner < handle
             % another previous cell) will add incorrect offsetting 
             % of the cell counter due to double counting of a
             % segment. To fix this, the following code is used.
+            graph_cells = numnodes(reeb_graph);
             
+            for i = 1:graph_cells
+                cell_num_check = decomposed_matrix == i;
+                
+                % Check if the cell number doesn't exist
+                if ~any(cell_num_check,'all')
+                    % This cell number was removed by a split/join.
+                    % Decrement all numbers after this 'skip'
+                    subtraction = decomposed_matrix>i;
+                    decomposed_matrix = decomposed_matrix-subtraction;
+                    
+                    % Update graph
+                    reeb_graph = rmnode(reeb_graph,i);
+                end
+            end
             
-            
+            % Update number of cells
+            num_cells = numnodes(reeb_graph);     
         end
         
         function [connectivity,connections] = slice_connectivity(obj,slice)
