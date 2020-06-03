@@ -12,9 +12,6 @@ classdef OfflineSearchPlanner < handle
         complete_waypoints
         segment_idx
         init_pose
-    end
-    
-    properties (Access = private)
         PathPlanner
     end
     
@@ -49,8 +46,8 @@ classdef OfflineSearchPlanner < handle
             
             % Initialise shortest path planner
             obj.PathPlanner = mobileRobotPRM(bi_occ_map);
-            obj.PathPlanner.NumNodes = 75;
-            obj.PathPlanner.ConnectionDistance = 5;
+            obj.PathPlanner.NumNodes = 75*24;
+            obj.PathPlanner.ConnectionDistance = 1;
         end 
         
         function [] = update_search_path(obj,init_pose)

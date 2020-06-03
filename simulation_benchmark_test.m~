@@ -6,7 +6,7 @@ clear
 % load lidarMap;
 % load outdoorEasyMap
 % load outdoorMediumMap
-load outdoorHardMap
+% load outdoorHardMap
 % load indoorEasyMap
 % load indoorMediumMap
 % load indoorHardMap
