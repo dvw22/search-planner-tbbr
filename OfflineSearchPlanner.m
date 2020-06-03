@@ -78,8 +78,18 @@ classdef OfflineSearchPlanner < handle
         function show_decomposed_map(obj)
             %display_decomposed_map Displays the cells of a decomposed map as different
             %grayscale shades
-
-            imshow(obj.decomposed_matrix, [min(obj.decomposed_matrix(:)),max(obj.decomposed_matrix(:))])
+            
+            % Scale cell numbers to values between 0 and just under 1
+            max_cell_value = 0.9;
+            divisor = obj.num_cells/max_cell_value;
+            scaled_decomposed = obj.decomposed_matrix/divisor;
+            
+            % Transform 0s (obstacles) in decomposed matrix into 1s
+            scaled_decomposed(scaled_decomposed==0) = 1;
+            
+            % Create map object and show
+            decomposed_map = occupancyMap(scaled_decomposed,obj.bi_occ_map.Resolution);
+            show(decomposed_map);
         end
     end
     
