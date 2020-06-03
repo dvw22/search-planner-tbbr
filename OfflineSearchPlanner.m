@@ -66,10 +66,12 @@ classdef OfflineSearchPlanner < handle
         
         function [] = plot_search_path(obj)
             %plot_path Plots the path as waypoints on the occupancy map
-
+            
             % Display map
             show(obj.bi_occ_map)
             hold on
+            % Plot points
+            scatter(obj.complete_waypoints(:,1),obj.complete_waypoints(:,2),25,'r','x')
             % Plot waypoint connection animation
             comet(obj.complete_waypoints(:,1),obj.complete_waypoints(:,2))
             hold off
