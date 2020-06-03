@@ -168,11 +168,10 @@ classdef OfflineSearchPlanner < handle
                     while isempty(travel_waypoints) == 1
                         % Publish info
                         disp(['Path planning failed between cell sequence ',num2str(i),' and ',num2str(i+1),'.'])
-                        disp('Increasing nodes and connection distance.')
+                        disp('Increasing nodes.')
 
                         % Increase nodes and connection distances
-                        obj.PathPlanner.NumNodes = obj.PathPlanner.NumNodes * 2;
-                        obj.PathPlanner.ConnectionDistance = obj.PathPlanner.ConnectionDistance * 2;
+                        obj.PathPlanner.NumNodes = obj.PathPlanner.NumNodes + 100;
 
                         % Calculate again
                         travel_waypoints = findpath(obj.PathPlanner,start_waypoint,end_waypoint);
@@ -242,11 +241,10 @@ classdef OfflineSearchPlanner < handle
                     while isempty(travel_waypoints) == 1
                         % Publish info
                         disp(['Path planning failed between cell sequence ',num2str(i),' and ',num2str(i+1),'.'])
-                        disp('Increasing nodes and connection distance.')
+                        disp('Increasing nodes.')
 
                         % Increase nodes and connection distances
-                        obj.PathPlanner.NumNodes = obj.PathPlanner.NumNodes * 2;
-                        obj.PathPlanner.ConnectionDistance = obj.PathPlanner.ConnectionDistance * 2;
+                        obj.PathPlanner.NumNodes = obj.PathPlanner.NumNodes + 100;
 
                         % Calculate again
                         travel_waypoints = findpath(obj.PathPlanner,start_waypoint,end_waypoint);
@@ -364,11 +362,10 @@ classdef OfflineSearchPlanner < handle
                 while isempty(inserted_path) == 1
                     % Publish info
                     disp('Path planning failed between cell waypoints.')
-                    disp('Increasing nodes and connection distance.')
+                    disp('Increasing nodes.')
 
                     % Increase nodes and connection distances
-                    obj.PathPlanner.NumNodes = obj.PathPlanner.NumNodes * 2;
-                    obj.PathPlanner.ConnectionDistance = obj.PathPlanner.ConnectionDistance * 2;
+                    obj.PathPlanner.NumNodes = obj.PathPlanner.NumNodes + 100;
 
                     % Calculate again
                     inserted_path = findpath(obj.PathPlanner,start_point,end_point);
