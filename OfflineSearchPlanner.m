@@ -1,5 +1,5 @@
 classdef OfflineSearchPlanner < handle
-    %SearchPlanner Calculates a search path within an occupancy map
+    %SearchPlanner Robot planner for generating search paths in a map
     %   This class is a handle because the methods are designed to update 
     %   the object's properties. 
     %

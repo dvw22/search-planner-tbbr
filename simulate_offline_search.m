@@ -1,6 +1,25 @@
 function [search_result] = simulate_offline_search(Search_robot,Test_suite,Search_planner,opi)
-%simulate_static_search Simulates a mobile robot executing an offline
-%search path on the map.
+%simulate_static_search Simulates a mobile robot offline search
+%   Search_robot - Object containing simulated mobile robot properties
+%   Test_suite - Object that tracks search performance during simulation
+%   Search_planner - Object containing search path planning data
+%   opi - specified location of Object of Potential Interest [x,y]
+%
+%   search_result - True if OPI detected, False if OPI not detected
+%
+%   The simulator sets up a mobile search robot with an object detector in 
+%   the specified occupancy map. An Object of Potential Interest (OPI) is
+%   also present in a specified location.
+%   The robot uses the search planner (which has already planned a path in
+%   the map) to access the search path waypoints, and follows them using a
+%   pure pursuit controller.
+%   During the search, the simulator keeps track of waypoint progress along
+%   the complete search path. The simulation ends when the OPI is detected
+%   within the sensing range of the object detector, or the last waypoint
+%   in the search path is reached.
+%   Search performance results can be accessed via the "SearchTestSuite"
+%   object's properties after the simulation.
+%   
 
 %% Simulation Loop Setup
 % Time Array
@@ -108,12 +127,15 @@ for i = 2:numel(time_vector)  % start index at 2nd element
     
     %% Waypoint Checking
     % Check distance between robot and waypoint
-    dist_between = [pose(1,i),pose(2,i);search_path(waypoint_idx-1,1),search_path(waypoint_idx-1,2)];
+    dist_between = [pose(1,i),pose(2,i); ...
+                    search_path(waypoint_idx-1,1),search_path(waypoint_idx-1,2)];
     
     % Waypoint reached if robot within radius
     if pdist(dist_between,'euclidean') < waypoint_radius    
         % Publish info
-        disp(['Waypoint ',num2str(waypoint_idx-1),'/',num2str(num_waypoints),' in segment ',num2str(segment-1),'/',num2str(num_segments),' reached.'])
+        disp(['Waypoint ',num2str(waypoint_idx-1),'/',num2str(num_waypoints), ...
+              ' in segment ',num2str(segment-1),'/',num2str(num_segments), ...
+              ' reached.'])
                 
         % Segment complete
         if waypoint_idx == num_waypoints+1

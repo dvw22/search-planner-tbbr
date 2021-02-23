@@ -1,20 +1,22 @@
 classdef SearchRobot < handle
-    %SearchRobot A mobile robot with an object detector and pure pursuit
-    %controller used for search robot simulation
-    %   Handle so that the pose can be updated within simulation functions
+    %SearchRobot Mobile search robot for search simulation
+    %   This class is a handle because the methods are designed to update 
+    %   the object's properties. 
+    %   The SearchRobot class initialises a mobile robot object with an
+    %   object detector and pure pursuit controller, to be used during
+    %   simulation of a mobile search robot.
     
     properties
-        Detector
-        MobileRobot
-        Controller
-        pose
+        Detector  % object detector object on robot
+        MobileRobot  % mobile robot object
+        Controller  % pure pursuit controller object for motion
+        pose  % starting pose of the robot
     end
     
     methods
         function obj = SearchRobot()
             %SearchRobot Construct an instance of this class
-            %   Initialise all the properties
-            
+ 
             % Object Detector
             obj.Detector = ObjectDetector;
             obj.Detector.fieldOfView = pi/4;  % [rad]
