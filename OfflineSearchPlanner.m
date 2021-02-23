@@ -1,7 +1,13 @@
 classdef OfflineSearchPlanner < handle
-    %SearchPlanner Offline planner that can calculate a search path within
-    %an occupancy map
-    %  Handle because the methods update the object's properties
+    %SearchPlanner Calculates a search path within an occupancy map
+    %   Class is a handle because the methods update the object's
+    %   properties. 
+    %
+    %   This is a 2D offline search planner so paths are planned once for a 
+    %   complete, static map. Objects require an occupancy map during 
+    %   instantiation, after which methods can be called to generate and
+    %   interpret a search path. A search path is an ordered set of 2D 
+    %   waypoints that can be provided to a mobile robot's mobility system.
     
     properties (SetAccess = private)
         bi_occ_map
@@ -17,7 +23,7 @@ classdef OfflineSearchPlanner < handle
     
     methods
         function obj = OfflineSearchPlanner(occ_map)
-            %SearchPlanner Construct an instance of this class
+            %SearchPlanner Constructor
             arguments
                 occ_map (1,1) occupancyMap 
             end
@@ -111,8 +117,6 @@ classdef OfflineSearchPlanner < handle
             complete_waypoints = [];
             segment_idx = [];
             num_cell_seq = size(obj.cell_order,1);
-            original_num_nodes = obj.PathPlanner.NumNodes;
-            original_conn_dis = obj.PathPlanner.ConnectionDistance;
 
             last_end_idx = 0;
             start_idx = 1;
