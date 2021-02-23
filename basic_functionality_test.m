@@ -1,3 +1,11 @@
+%basic_functionality_test Test basic functionality of the search robot
+%   This script tests the correct functioning of the SearchRobot and
+%   SearchTestSuite objects during simulation.
+%   The robot first performs a figure 8 motion using custom waypoints. It
+%   then collides into an obstacle twice to check collision detection.
+%   Finally, the robot is directed towards an Object of Potential Interest
+%   (OPI). The simulation should end when the robot detects the OPI.
+
 clear
 
 %% Map Setup
