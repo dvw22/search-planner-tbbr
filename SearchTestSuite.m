@@ -26,9 +26,11 @@ classdef SearchTestSuite < handle
     methods
         function obj = SearchTestSuite(occ_map)
             %SearchTestSuite Construct an instance of this class
+            %   The object must be constructed with an occupancy map
             arguments
                 occ_map (1,1) occupancyMap 
             end
+            
             % Convert to binary occupancy map
             occ_matrix = occupancyMatrix(occ_map);
             bi_occ_matrix = occ_matrix >= occ_map.DefaultValue;  % convert to binary matrix

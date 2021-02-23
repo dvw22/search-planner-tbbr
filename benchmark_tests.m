@@ -81,5 +81,8 @@ Test_suite.computation_time = toc;
 % Plot Path
 Search_planner.plot_search_path()
 
+% Show Cell Decomposition
+Search_planner.show_decomposed_map()
+
 % Simulate Search
 result = simulate_offline_search(Search_robot,Test_suite,Search_planner,opi);

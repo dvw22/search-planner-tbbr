@@ -1,7 +1,7 @@
 classdef OfflineSearchPlanner < handle
     %SearchPlanner Calculates a search path within an occupancy map
-    %   Class is a handle because the methods update the object's
-    %   properties. 
+    %   This class is a handle because the methods are designed to update 
+    %   the object's properties. 
     %
     %   This is a 2D offline search planner so paths are planned once for a 
     %   complete, static map. Objects require an occupancy map during 
@@ -10,23 +10,25 @@ classdef OfflineSearchPlanner < handle
     %   waypoints that can be provided to a mobile robot's mobility system.
     
     properties (SetAccess = private)
-        bi_occ_map
-        decomposed_matrix
-        graph
-        num_cells
-        cell_order
-        complete_waypoints
-        segment_idx
-        init_pose
-        PathPlanner
+        bi_occ_map  % binary occupancy map of area to plan path in
+        decomposed_matrix  % cell decomposed map (0=obstacles, 1+=cells)
+        graph  % graph of cells in occupancy map
+        num_cells  % number of cells in occupancy map
+        cell_order  % order to search cells in occupancy map
+        complete_waypoints  % complete list of search path waypoints
+        segment_idx  % indices of path segments in complete search path
+        init_pose  % initial pose of robot in occupancy map
+        PathPlanner  % shortest path planner object
     end
     
     methods
         function obj = OfflineSearchPlanner(occ_map)
-            %SearchPlanner Constructor
+            %SearchPlanner Construct an instance of this class
+            %   The object must be constructed with an occupancy map
             arguments
                 occ_map (1,1) occupancyMap 
             end
+            
             % Convert map to binary map
             occ_matrix = occupancyMatrix(occ_map);
             bi_occ_matrix = occ_matrix >= occ_map.DefaultValue;  % convert to binary matrix
@@ -56,7 +58,13 @@ classdef OfflineSearchPlanner < handle
             obj.PathPlanner.ConnectionDistance = 1;
         end 
         
-        function [] = update_search_path(obj,init_pose)
+        function update_search_path(obj,init_pose)
+            %update_search_path Generate a search path within a map
+            %   init_pose - starting pose of robot [x, y, angle]
+            %
+            %   Calculates and stores a set of search path waypoints within
+            %   the "complete_waypoints" property.
+            
             % Save init pose
             obj.init_pose = init_pose;
             
@@ -70,11 +78,13 @@ classdef OfflineSearchPlanner < handle
             [obj.complete_waypoints, obj.segment_idx] = obj.complete_search_path();
         end
         
-        function [] = plot_search_path(obj)
+        function plot_search_path(obj)
             %plot_path Plots the path as waypoints on the occupancy map
+            %   The comet function is used to animate the search path and
+            %   indicate their order on the occupancy map.
             
             % Display map
-            show(obj.bi_occ_map)
+            figure, show(obj.bi_occ_map)
             hold on
             % Plot points
             scatter(obj.complete_waypoints(:,1),obj.complete_waypoints(:,2),25,'r','x')
@@ -84,8 +94,10 @@ classdef OfflineSearchPlanner < handle
         end
         
         function show_decomposed_map(obj)
-            %display_decomposed_map Displays the cells of a decomposed map as different
-            %grayscale shades
+            %display_decomposed_map Display segmented map for path planning
+            %   Displays the 'cells' of a decomposed map generated during
+            %   Boustrophedon cell decomposition as different greyscale
+            %   shades
             
             % Scale cell numbers to values between 0 and just under 1
             max_cell_value = 0.9;
@@ -97,16 +109,21 @@ classdef OfflineSearchPlanner < handle
             
             % Create map object and show
             decomposed_map = occupancyMap(scaled_decomposed,obj.bi_occ_map.Resolution);
-            show(decomposed_map);
+            figure, show(decomposed_map);
         end
     end
     
     methods (Access = private)
         function [complete_waypoints,segment_idx] = complete_search_path(obj)
-            % map_search_path Outputs a full waypoint list with a segment indices matrix
-            % to access segmented regions during the waypoint planning process.
-            %   The segments are either a cell sequence path or a shortest path between
-            %   cells.
+            %map_search_path Combine and generate complete search path
+            %   complete_waypoints - ordered list of waypoints [[x,y], ...]
+            %   segment_idx - location of segments in complete waypoints
+            %
+            %   Outputs a list of complete waypoint together with a list of
+            %   'segment' locations in the complete list. The complete 
+            %   search path is built from 'segments', which are either a 
+            %   set of waypoints generated within along a sequence of 
+            %   'cells' or a shortest path connecting 'cells'
             
             % Transform pose to just x,y position
             init_xy = [obj.init_pose(1), obj.init_pose(2)];
@@ -210,13 +227,17 @@ classdef OfflineSearchPlanner < handle
         end
         
         function [cell_seq_waypoints, num_cells_in_seq] = cell_seq_search_path(obj,cell_seq)
-            % cell_seq_search_path Outputs waypoints for a set of cells in an optimised order
-            %   Gets a row in from a cell order plan matrix. Slices off zeroed
-            %   elements. Inputs each element as a cell number to cell_search_path.
-            %   Appends the result to a full cell sequence waypoint matrix.
+            % cell_seq_search_path
+            %   cell_seq - list of adjacent cells [int,int,int,...,0,0,0]
+            %   
+            %   cell_waypoints - ordered list of cell waypoints [[x,y],...]
+            %   num_waypoints - number of waypoints in the cell
+            % 
+            %   Outputs a list of waypoints connecting a sequence of cells.
+            %   It works by planning shortest paths between
 
             %% Preparation
-            % Slice off zeros
+            % Slice off unnecessary zeros in cell_seq
             cell_seq = cell_seq(:,any(cell_seq,1));
 
             %% Initialise
@@ -276,8 +297,17 @@ classdef OfflineSearchPlanner < handle
         end     
 
         function [cell_waypoints, num_waypoints] = cell_search_path(obj,cell)
-            % cell_search path Generates a search path within a cell
-            %   Detailed explanation goes here
+            %cell_search path Generates a search path within a cell
+            %   cell - positive integer indicating number of cell
+            %
+            %   cell_waypoints - ordered list of cell waypoints [[x,y],...]
+            %   num_waypoints - number of waypoints in the cell
+            %
+            %   Generates a collision-free search path within a cell. First
+            %   acquires waypoints at the top and bottom of a cell, 'zips'
+            %   them together to form rectilinear Boustrophedon paths.
+            %   Lastly, collision free paths are inserted between some
+            %   waypoints prone to causing collisions.
 
             % Initialise
             cell_indices = [];  % uses appending method because easier for now
@@ -403,9 +433,15 @@ classdef OfflineSearchPlanner < handle
         end
         
         function [cell_ceiling_idx,cell_floor_idx] = ceil_floor_cell(obj,cell)
-            % ceil_floor_cell Generates boustrophedon paths in each cell in a
-            % boustrophedon cell decomposed occupancy map
-            %   Returns indices of matrix [row1,col1; row2,col2; ...]
+            %ceil_floor_cell Generate waypoints on top and bottom of cell
+            %   cell - positive integer indicating number of cell
+            %   
+            %   cell_ceiling_idx - ordered cell ceiling waypoints [x, y]
+            %   cell_floor_idx - ordered cell floor waypoints [x, y]
+            %
+            %   After specifying a cell, waypoints are generated just below
+            %   their top contour ('ceiling') and above their bottom 
+            %   contour ('floor').
 
             % Truncate matrix to cell of interest size
             zeroed_except_cell = obj.decomposed_matrix==cell;  % zero all other cells
@@ -459,8 +495,14 @@ classdef OfflineSearchPlanner < handle
         end
         
         function [cell_order] = plan_cell_order(obj)
-            % plan_cell_order Determines what order the cells should be searched for
-            % complete coverage
+            %plan_cell_order Generate a cell searching order 
+            %   cell_order - list of cell sequences [[cell_seq], ...]
+            %
+            %   Determines what order the cells should be searched for
+            %   complete coverage. Each 'cell_seq' is a sequence of
+            %   adjacent cells. They are initialised with zeros and number
+            %   of elements equal to the total number of cells, to 
+            %   preallocate list size.
             
             % Initialise reeb graph
             reeb_graph = obj.graph;
@@ -554,11 +596,19 @@ classdef OfflineSearchPlanner < handle
         end
         
         function [decomposed_matrix, reeb_graph, num_cells] = btd_cell_decomposition(obj)
-            %btd_cell_decomposition Uses boustrophedon cell decomposition to output a
-            %region divided occupancy map
-            %   The occupancy map must have a border of occupied cells for it to work.
-            %   For the output, a 0 is an obstacle and the integers are the
-            %   corresponding cell number.
+            %btd_cell_decomposition Decompose a map into cells
+            %   decomposed_matrix - % cell decomposed map
+            %   reeb_graph - graph object describes the adjacency of cells
+            %   num_cells - number of cells generated in the map
+            %
+            %   Boustrophedon cell decomposition divides a map into
+            %   obstacle-free regions called 'cells'. The cells have
+            %   amorphous top and bottom contours, but straight line left
+            %   and right edges. Paths can then be planned in these cells.
+            %   For this function to work, the occupancy map must have an 
+            %   enclosing border of occupied cells.
+            %   In the output matrix, a 0 is an obstacle and all other
+            %   integers correspond to a specific cell.
 
             % Get binary occupancy matrix
             bi_occ_matrix = occupancyMatrix(obj.bi_occ_map);
@@ -747,14 +797,22 @@ classdef OfflineSearchPlanner < handle
         end
         
         function [connectivity,connections] = slice_connectivity(obj,slice)
-            % slice_connectivity Calculates the number of connected segments and
-            % returns their indices
-            %   If the previous index is a 0 and this one is a 1, a connectivity has
-            %   opened. Log this point as a start point. Otherwise, if the previous 
-            %   index is a 1 and this one is a 0 and a connectivity was opened, a 
-            %   connectivity has closed. Log this point as an end point. 
-            %   Try to track the number of connectivities. The start and end of a
-            %   connectivity should occupy a row.
+            %slice_connectivity Identifies connections in a slice of map
+            %   slice - vertical slice in occupancy map
+            %   
+            %   connectivity - number of connections in a slice
+            %   connections - starts and ends of connections in slice [[s,e],...]
+            % 
+            %   Connections are segments in an occupancy map with adjacent,
+            %   unoccupied grid units. 
+            %   This function calculates the number of connected segments 
+            %   in a vertical slice of an occupancy map and returns their
+            %   locations.
+            %   If the previous index is a 0 and this one is a 1, a 
+            %   connectivity has opened. Log this point as a start point. 
+            %   Otherwise, if the previous index is a 1 and this one is a 0
+            %   and a connectivity was opened, a connectivity has closed. 
+            %   Log this point as an end point. 
 
             %% Initialise
             connectivity = 0;
@@ -791,9 +849,16 @@ classdef OfflineSearchPlanner < handle
         end
         
         function [adjacency_matrix] = connections_adjacency(obj,connections_L,connections_R)
-            % connections_adjacency Returns the adjacency matrix for two neighbouring
-            % connectivity slices
-            %   Detailed explanation goes here
+            %connections_adjacency Adjacency matrix of slices' connections
+            %   connections_L - connections in left-hand slice
+            %   connections_R - connections in right-hand slice
+            %
+            %   adjacency_matrix - n x n matrix
+            %
+            %   Returns the adjacency matrix describing adjacency of 
+            %   connections between two neighbouring slices. The adjacency
+            %   of connections between slices affects the generation of new
+            %   cells during Boustrophedon cell decomposition.
 
             %% Initialise Matrix
             adjacency_matrix = zeros(size(connections_L,1), size(connections_R,1)); 
