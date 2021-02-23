@@ -1,7 +1,7 @@
 clear
 
 %% Map Setup
-load basicMap;
+load occupancy_maps/basicMap;
 
 %% Other Setup
 % Search Robot Object
@@ -14,7 +14,7 @@ Test_suite = SearchTestSuite(map);
 Search_robot.pose = [13; 10; pi/4];  % [x, y, theta]
 opi = [3, 11, 1];  % [x, y, label]
 
-% Waypoints
+% Custom Waypoints
 movement_path = [14,11;
                  14.5,12;
                  14,13;
@@ -41,9 +41,6 @@ movement_path = [14,11;
                  8,4;
 
                  3,10];
-
-
-%% Simulation
 
 %% Simulation Loop Setup
 % Time Array
