@@ -126,7 +126,7 @@ classdef OfflineSearchPlanner < handle
                 % Calculate waypoints before travel first time only
                 if i == 1
                     % Append cell sequence waypoints
-                    [cell_seq_waypoints, num_cells_in_seq] = obj.cell_seq_search_path(obj.cell_order(i,:));
+                    [cell_seq_waypoints, ~] = obj.cell_seq_search_path(obj.cell_order(i,:));
                     complete_waypoints = [complete_waypoints; cell_seq_waypoints];
 
                     % Append cell sequence indices
@@ -171,7 +171,7 @@ classdef OfflineSearchPlanner < handle
                 % Append travel waypoints
                 if i < num_cell_seq
                     % Get next cell sequence waypoints
-                    [next_cell_seq_waypoints, num_cells_in_seq] = obj.cell_seq_search_path(obj.cell_order(i+1,:));
+                    [next_cell_seq_waypoints, ~] = obj.cell_seq_search_path(obj.cell_order(i+1,:));
 
                     % Get start and end points for travel
                     start_waypoint = cell_seq_waypoints(end,:);  % starting at end of last cell sequence
@@ -500,7 +500,7 @@ classdef OfflineSearchPlanner < handle
                             cell_seq(cell_seq_idx) = cell;  % append to continuous cell sequence
 
                             % New cell is no longer unsearched
-                            unsearched_cells(find(unsearched_cells==cell)) = [];  % remove cell
+                            unsearched_cells(unsearched_cells==cell) = [];  % remove cell
                             break
                         end
                     end
@@ -520,7 +520,7 @@ classdef OfflineSearchPlanner < handle
                         cell_seq(cell_seq_idx) = cell;
 
                         % New cell is no longer unsearched
-                        unsearched_cells(find(unsearched_cells==cell)) = [];  % remove cell
+                        unsearched_cells(unsearched_cells==cell) = [];  % remove cell
                     end     
 
                 % The cell is a dead end
@@ -538,7 +538,7 @@ classdef OfflineSearchPlanner < handle
                     cell_seq(cell_seq_idx) = cell;
 
                     % New cell is no longer unsearched
-                    unsearched_cells(find(unsearched_cells==cell)) = [];  % remove cell
+                    unsearched_cells(unsearched_cells==cell) = [];  % remove cell
                 end
 
                 % Increment loop
@@ -638,7 +638,7 @@ classdef OfflineSearchPlanner < handle
                         elseif sum(adj_matrix(i,:)) == 0
                             % Find the removal index
                             cell_of_interest = last_cells(i);  % find the number of the cell
-                            index_of_interest = find(current_cells==cell_of_interest);
+                            index_of_interest = current_cells==cell_of_interest;
 
                             % Remove the cell from the current cells array
                             current_cells(index_of_interest) = [];
