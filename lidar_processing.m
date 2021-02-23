@@ -39,42 +39,38 @@ processed_matrix = imopen(bi_occ_matrix,structuring_element);
 
 processed_occ_map = occupancyMap(processed_matrix,map.Resolution);
 
-% Inflate map by robot dimension
-inflate(processed_occ_map,2,'grid');
-
 show(processed_occ_map)
 
 
-%% Reduce resolution
-
-% Reduction variable
-reduction = 5;
-
-% Get map matrix
-num_row = size(bi_occ_matrix,1);
-num_col = size(bi_occ_matrix,2);
-
-% Initialise halved occ_matrix
-reduced_matrix = zeros(num_row/reduction,num_col/reduction);
-i = 1;
-j = 1;
-
-for row = 1:reduction:num_row
-    for col = 1:reduction:num_col
-        reduced_matrix(i,j) = processed_matrix(row,col);
-        j = j+1;
-    end
-    
-    % Increment inner loop row counter
-    i = i+1;
-    % Reset inner loop col counter
-    j = 1;
-end
-
-reduced_occ_map = occupancyMap(reduced_matrix,map.Resolution/reduction);
-inflate(reduced_occ_map,1,'grid');
-
-show(reduced_occ_map)
+% %% Reduce resolution
+% 
+% % Reduction variable
+% reduction = 5;
+% 
+% % Get map matrix
+% num_row = size(bi_occ_matrix,1);
+% num_col = size(bi_occ_matrix,2);
+% 
+% % Initialise halved occ_matrix
+% reduced_matrix = zeros(num_row/reduction,num_col/reduction);
+% i = 1;
+% j = 1;
+% 
+% for row = 1:reduction:num_row
+%     for col = 1:reduction:num_col
+%         reduced_matrix(i,j) = processed_matrix(row,col);
+%         j = j+1;
+%     end
+%     
+%     % Increment inner loop row counter
+%     i = i+1;
+%     % Reset inner loop col counter
+%     j = 1;
+% end
+% 
+% reduced_occ_map = occupancyMap(reduced_matrix,map.Resolution/reduction);
+% 
+% show(reduced_occ_map)
 
 
 

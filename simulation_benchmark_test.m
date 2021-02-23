@@ -9,7 +9,7 @@ clear
 % load outdoorHardMap
 % load indoorEasyMap
 % load indoorMediumMap
-% load indoorHardMap
+load occupancy_maps/indoorHardMap
 
 % Inflate map
 inflated_map = copy(map);
