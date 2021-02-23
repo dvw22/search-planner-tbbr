@@ -19,27 +19,35 @@ while(true)
     switch selection
         case 1
             load occupancy_maps/exampleMap;
+            pose = [1.25; 11.75; pi/2];  % [x, y, theta]
             break
         case 2
             load occupancy_maps/complexMap;
+            pose = [1.25; 18.75; pi/2];  % [x, y, theta]
             break
         case 3
             load occupancy_maps/indoorEasyMap;
+            pose = [1.25; 18.75; pi/2];  % [x, y, theta]
             break
         case 4
             load occupancy_maps/indoorMediumMap;
+            pose = [1.25; 18.75; pi/2];  % [x, y, theta]
             break
         case 5
             load occupancy_maps/indoorHardMap;
+            pose = [1.25; 18.75; pi/2];  % [x, y, theta]
             break
         case 6
             load occupancy_maps/outdoorEasyMap;
+            pose = [1.25; 18.75; pi/2];  % [x, y, theta]
             break
         case 7
             load occupancy_maps/outdoorMediumMap;
+            pose = [1.25; 18.75; pi/2];  % [x, y, theta]
             break
         case 8
             load occupancy_maps/outdoorHardMap;
+            pose = [1.25; 18.75; pi/2];  % [x, y, theta]
             break
         otherwise
             disp('Invalid option. Please enter a single integer from 1-8')
@@ -61,8 +69,8 @@ Search_planner = OfflineSearchPlanner(inflated_map);
 Test_suite = SearchTestSuite(map);
 
 % Starting Positions
-Search_robot.pose = [1.25; 18.75; pi/2];  % [x, y, theta]
-opi = [0.25, 0.25, 1];  % [x, y, label]
+Search_robot.pose = pose;
+opi = [0.25, 0.25, 1];  % [x, y, label], hidden OPI for full exploration
 
 %% Plan Search Path and Measure Computation Time
 tic
