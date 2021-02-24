@@ -1,3 +1,14 @@
+%benchmark_tests.m Simulate search robot performance on specified map
+%   This script simulates a mobile robot search guided by the
+%   OfflineSearchPlanner object. The user is first prompted to select one
+%   of the 8 available maps via standard input in the terminal. The script
+%   then displays three windows:
+%   1 - Planned robot search trajectory in the map
+%   2 - Cell decomposition of the map
+%   3 - Simulation of mobile robot following the planned search path
+%   Search performance results are collected in the SearchTestSuite object,
+%   which can be examined after the simulation.
+
 clear
 
 %% Map Setup
