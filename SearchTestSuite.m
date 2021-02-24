@@ -1,26 +1,32 @@
 classdef SearchTestSuite < handle
-    %SearchTestSuite Measures and collects relevant search metrics during
-    %simulation.
-    %   Handle because the methods need to update the object's properties
+    %SearchTestSuite Measure search performance during simulation
+    %   This class is a handle because the methods are designed to update 
+    %   the object's properties. 
+    %
+    %   A SearchTestSuite object measures and collects relevant search 
+    %   metrics during a search simulation. It tracks the search coverage
+    %   of the robot and detects collisions with the environment. Other
+    %   metrics such as search planner computation time and search duration
+    %   are also tracked.
     
     properties
-        search_time
-        computation_time
+        search_time  % duration of completed search 
+        computation_time  % time for complete search path generation
     end
     
     properties (SetAccess = private)
-        bi_occ_map
-        unoccupied_area
-        search_coverage
-        num_collisions
-        search_map
+        bi_occ_map  % binary occupancy map object
+        unoccupied_area  % area that can be visited by the robot (m^2)
+        search_coverage  % percentage of available area searched (%)
+        num_collisions  % tracks robot collisions with obstacles
+        search_map  % displays area searched via an occupancy map
     end
     
     properties (Access = private)
-        searched_area
-        search_matrix
-        last_collision
-        search_occ_matrix
+        searched_area  % area covered by the object detector (m^2)
+        search_matrix  % tracks area searched in the map
+        last_collision  % collision count reset flag
+        search_occ_matrix  % normalised search_matrix (0 to 1)
     end
     
     methods
@@ -73,6 +79,8 @@ classdef SearchTestSuite < handle
         
         function [unoccupied_area] = calc_unoccupied_area(obj)
             %unoccupied_area Calculates the total free area in the map
+            %   unoccupied_area - area visitable by the robot (m^2)
+            
             bi_occ_matrix = occupancyMatrix(obj.bi_occ_map);
             
             num_occupied_units = sum(sum(bi_occ_matrix));
@@ -81,9 +89,13 @@ classdef SearchTestSuite < handle
             unoccupied_area = (1/obj.bi_occ_map.Resolution)^2 * num_unoccupied_units;  % convert to area
         end
         
-        function [] = add_searched_area(obj,pose)
-            % update_search_matrix Adds the grid units currently in the object 
-            % detector's FoV and DoF to the search matrix
+        function add_searched_area(obj,pose)
+            %update_search_matrix Add searched area at robot pose
+            %   pose - robot's current pose [x,y,angle]
+            %
+            %   Adds the grid units currently in the mobile robot's object 
+            %   detector's Field of View (FoV) and Depth of Field (DoF) to 
+            %   the search matrix.
             %   Within the search matrix:
             %   0: unsearched
             %   1: occupied
@@ -145,7 +157,15 @@ classdef SearchTestSuite < handle
             
         end
         
-        function [] = update_collision(obj,pose)
+        function update_collision(obj,pose)
+            %update_collision Check potential collisions at position
+            %   pose - robot's current pose [x,y,angle]
+            %
+            %   Using the robot's position and the occupancy map, this
+            %   function detects whether a new collision has occurred. A
+            %   new collision occurs when the robot moves from an
+            %   unoccupied space to an occupied space in the map.
+            
             % Pose is in an occupied space
             if getOccupancy(obj.bi_occ_map,[pose(1),pose(2)])==1
                 % Add to counter if wasn't in a collision previously
@@ -164,17 +184,17 @@ classdef SearchTestSuite < handle
     end
     
     methods (Access = private)
-        function [] = update_search_coverage(obj)
-            %unoccupied_area Calculates the current search coverage
-            % Update searched area
+        function update_search_coverage(obj)
+            %update_search_coverage Calculates the current search coverage
+            
             obj.update_searched_area()
             
             % Calculate search coverage
             obj.search_coverage = 100 * (obj.searched_area/obj.unoccupied_area);
         end
         
-        function [] = update_searched_area(obj)
-            %update_searched_area Calculates the current total searched area in the map 
+        function update_searched_area(obj)
+            %update_searched_area Calculates the current total searched area
             
             % Get logical mask of search grid units
             searched = obj.search_matrix==2;
@@ -184,9 +204,9 @@ classdef SearchTestSuite < handle
             obj.searched_area = (1/obj.bi_occ_map.Resolution)^2 * num_searched_units;  % convert to area
         end
         
-        function [] = update_search_map(obj)
-            %update_search_map Updates the search map and search occupancy
-            %matrix
+        function update_search_map(obj)
+            %update_search_map Updates the search occupancy matrix and map
+            
             obj.search_occ_matrix(obj.search_matrix==2) = 0.5;
             obj.search_map = occupancyMap(obj.search_occ_matrix,obj.bi_occ_map.Resolution);
         end
