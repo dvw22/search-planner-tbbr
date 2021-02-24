@@ -227,14 +227,13 @@ classdef OfflineSearchPlanner < handle
         end
         
         function [cell_seq_waypoints, num_cells_in_seq] = cell_seq_search_path(obj,cell_seq)
-            % cell_seq_search_path
+            % cell_seq_search_path Connect adjacent cell sequence waypoints
             %   cell_seq - list of adjacent cells [int,int,int,...,0,0,0]
             %   
             %   cell_waypoints - ordered list of cell waypoints [[x,y],...]
             %   num_waypoints - number of waypoints in the cell
             % 
             %   Outputs a list of waypoints connecting a sequence of cells.
-            %   It works by planning shortest paths between
 
             %% Preparation
             % Slice off unnecessary zeros in cell_seq
@@ -304,8 +303,9 @@ classdef OfflineSearchPlanner < handle
             %   num_waypoints - number of waypoints in the cell
             %
             %   Generates a collision-free search path within a cell. First
-            %   acquires waypoints at the top and bottom of a cell, 'zips'
-            %   them together to form rectilinear Boustrophedon paths.
+            %   acquires waypoints at the top and bottom of a cell, then 
+            %   'zips' them together to form rectilinear Boustrophedon
+            %   paths.
             %   Lastly, collision free paths are inserted between some
             %   waypoints prone to causing collisions.
 
@@ -503,6 +503,9 @@ classdef OfflineSearchPlanner < handle
             %   adjacent cells. They are initialised with zeros and number
             %   of elements equal to the total number of cells, to 
             %   preallocate list size.
+            %   This is technically optimally solved by a TSP solver. For
+            %   simplicity, this function tries to create long sequences of
+            %   adjacent cells to minimise travel.
             
             % Initialise reeb graph
             reeb_graph = obj.graph;
