@@ -8,7 +8,7 @@ classdef SearchRobot < handle
     %   simulation of a mobile search robot. The pure pursuit controller
     %   has a very high max angular velocity and short look ahead distance
     %   to emulate the movement behaviour of a turtlebot. This results in
-    %   some oscillation during sharp turns during simulation.
+    %   some oscillation during sharp turns in the simulation.
     
     properties
         Detector  % object detector object on robot

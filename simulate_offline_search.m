@@ -3,7 +3,7 @@ function [search_result] = simulate_offline_search(Search_robot,Test_suite,Searc
 %   Search_robot - Object containing simulated mobile robot properties
 %   Test_suite - Object that tracks search performance during simulation
 %   Search_planner - Object containing search path planning data
-%   opi - specified location of Object of Potential Interest [x,y]
+%   opi - specified location of Object of Potential Interest
 %
 %   search_result - True if OPI detected, False if OPI not detected
 %
