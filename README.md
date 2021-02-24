@@ -3,6 +3,8 @@ This project showcases a "Search Planner" subsystem I developed in MATLAB for my
 
 The search path is communicated to a robot via an ordered list of waypoints. To test the effectiveness of the Search Planner, a 2D mobile search robot simulator was developed using MATLAB's Mobile Robotics Simulation Toolbox. The overall project is best demonstrated via the simulations and details on how to set them up and run them are provided below.
 
+![Indoor hard simulation](https://media.giphy.com/media/9a1OfxBVKZ3SSPMQHL/giphy.gif)
+
 ## Prerequisites
 MATLAB is required to run this project. I recommend using the latest version, MATLAB 2020b - the project has not been tested thoroughly on other versions of MATLAB.
 
