@@ -1,7 +1,7 @@
 # Search Planner Simulator
 This project showcases a "Search Planner" subsystem I developed in MATLAB for my third year individual design project at university. The Search Planner provides offline searching capabilities to a mobile robot via a complete coverage paradigm. This is achieved by performing Boustrophedon Cellular Decomposition on a complete map to divide it into obstacle free regions, and then planning rectilinear boustrophedon paths within these cells (this effectively reduces area coverage to a cell order planning problem).
 
-The search path is communicated via an ordered set of waypoints. To test the effectiveness of the Search Planner, a mobile search robot simulator was developed using MATLAB's Mobile Robotics Simulation Toolbox. The overall project is best demonstrated via the simulations and details on how to set them up and run the are provided below.
+The search path is communicated to a robot via an ordered list of waypoints. To test the effectiveness of the Search Planner, a 2D mobile search robot simulator was developed using MATLAB's Mobile Robotics Simulation Toolbox. The overall project is best demonstrated via the simulations and details on how to set them up and run the are provided below.
 
 ## Prerequisites
 MATLAB is required to run this project. I recommend using the latest version, MATLAB 2020b - the project has not been tested thoroughly on other versions of MATLAB.
