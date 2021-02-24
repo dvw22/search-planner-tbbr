@@ -1,4 +1,4 @@
-%benchmark_tests.m Simulate search robot performance on specified map
+%benchmark_tests Simulate search robot performance on specified map
 %   This script simulates a mobile robot search guided by the
 %   OfflineSearchPlanner object. The user is first prompted to select one
 %   of the 8 available maps via standard input in the terminal. The script
