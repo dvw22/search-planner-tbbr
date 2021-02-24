@@ -2,9 +2,13 @@ classdef SearchRobot < handle
     %SearchRobot Mobile search robot for search simulation
     %   This class is a handle because the methods are designed to update 
     %   the object's properties. 
+    %
     %   The SearchRobot class initialises a mobile robot object with an
     %   object detector and pure pursuit controller, to be used during
-    %   simulation of a mobile search robot.
+    %   simulation of a mobile search robot. The pure pursuit controller
+    %   has a very high max angular velocity and short look ahead distance
+    %   to emulate the movement behaviour of a turtlebot. This results in
+    %   some oscillation during sharp turns during simulation.
     
     properties
         Detector  % object detector object on robot
