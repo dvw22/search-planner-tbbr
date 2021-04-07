@@ -1,12 +1,12 @@
 # Search Planner Simulator
-This project showcases a "Search Planner" subsystem I developed in MATLAB for my third year individual design project at university. The Search Planner provides offline searching capabilities to a mobile robot via a complete coverage paradigm. This is achieved by performing Boustrophedon Cellular Decomposition on a complete map to divide it into obstacle free regions, and then planning rectilinear Boustrophedon paths within these cells (this effectively reduces area coverage to a cell order planning problem).
+This project showcases a "Search Planner" subsystem I developed in MATLAB for my third year individual design project at university. The Search Planner provides offline searching capabilities to a mobile robot via a complete coverage paradigm. This is achieved by performing Boustrophedon Cellular Decomposition on a complete map to divide it into obstacle free regions, and then planning rectilinear Boustrophedon paths within these cells (effectively reducing area coverage to a cell order planning problem).
 
 The search path is communicated to a robot via an ordered list of waypoints. To test the effectiveness of the Search Planner, a 2D mobile search robot simulator was developed using MATLAB's Mobile Robotics Simulation Toolbox. The overall project is best demonstrated via the simulations and details on how to set them up and run them are provided below.
   
 ![Indoor hard simulation](https://media.giphy.com/media/9a1OfxBVKZ3SSPMQHL/giphy.gif)
 
 ## Prerequisites
-MATLAB is required to run this project. I recommend using the latest version, MATLAB 2020b - the project has not been tested thoroughly on other versions of MATLAB.
+MATLAB is required to run this project. MATLAB 2020b was used for testing - the project has not been tested thoroughly on other versions of MATLAB.
 
 The following toolboxes are dependencies, and so must be installed via MATLAB's add-on manager:
 * Mobile Robotics Simulation Toolbox (https://uk.mathworks.com/matlabcentral/fileexchange/66586-mobile-robotics-simulation-toolbox)
